@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bisht Brothers | Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --excel-green: #76933c; --excel-blue: #d9e1f2; --excel-paid: #c6efce; }
+        body { background: #f8f9fa; font-family: Arial, sans-serif; }
+        .navbar { background: #333; color: white; margin-bottom: 20px; }
+        .excel-table { width: 100%; border-collapse: collapse; background: white; border: 2px solid #333; }
+        .excel-table th, .excel-table td { border: 1px solid #aaa; padding: 12px; text-align: center; }
+        .head-green { background: var(--excel-green); color: white; font-weight: bold; }
+        .head-blue { background: var(--excel-blue); font-weight: bold; }
+        .paid-green { background: var(--excel-paid); color: #006100; font-weight: bold; }
+        .total-yellow { background: #ffff00; font-weight: bold; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <script>if(!localStorage.getItem('auth_bisht')) window.location.href='/';</script>
+
+    <nav class="navbar px-4 py-2">
+        <span class="h4 m-0">Bisht Brothers Close Friends Dashboard</span>
+        <button onclick="localStorage.clear(); location.reload();" class="btn btn-outline-light btn-sm">Logout</button>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="card p-4 mb-4">
+            <h5 class="mb-3 text-muted">Add New Record</h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <select id="mName" class="form-select">
+                        <option>Deepak Singh Bisht</option><option>Lokesh Singh Bisht</option>
+                        <option>Suraj Singh Bisht</option><option>Karan Singh Bisht</option>
+                        <option>Himanshu Bisht</option><option>Gaurav Bisht</option>
+                    </select>
+                </div>
+                <div class="col-md-2"><input type="number" id="mAmt" class="form-control" placeholder="Amount (₹)"></div>
+                <div class="col-md-3"><input type="month" id="mMonth" class="form-control"></div>
+                <div class="col-md-2"><button onclick="saveData()" class="btn btn-success w-100 fw-bold">Update Record</button></div>
+            </div>
+        </div>
+
+        <div class="table-responsive bg-white p-2">
+            <table class="excel-table">
+                <thead>
+                    <tr class="head-green">
+                        <th>Month / Name</th>
+                        <th>Deepak</th><th>Lokesh</th><th>Suraj</th><th>Karan</th><th>Himanshu</th><th>Gaurav</th>
+                        <th class="total-yellow">Monthly Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const members = ["Deepak Singh Bisht", "Lokesh Singh Bisht", "Suraj Singh Bisht", "Karan Singh Bisht", "Himanshu Bisht", "Gaurav Bisht"];
+        const months = ["2026-03", "2026-02", "2026-01"];
+
+        async function fetchGrid() {
+            const res = await fetch('/api/records');
+            const data = await res.json();
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+
+            months.forEach(m => {
+                let rowSum = 0;
+                let html = `<tr><td class="head-blue">${m}</td>`;
+                members.forEach(mem => {
+                    const match = data.find(d => d.name === mem && d.month === m);
+                    if(match) {
+                        html += `<td class="paid-green">₹${match.amount}</td>`;
+                        rowSum += match.amount;
+                    } else { html += `<td>-</td>`; }
+                });
+                html += `<td class="total-yellow">₹${rowSum}</td></tr>`;
+                body.innerHTML += html;
+            });
+        }
+
+        async function saveData() {
+            const name = document.getElementById('mName').value;
+            const amount = document.getElementById('mAmt').value;
+            const month = document.getElementById('mMonth').value;
+            if(!amount || !month) return alert("Pura data bharo bhai!");
+
+            await fetch('/api/records', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, amount, month })
+            });
+            document.getElementById('mAmt').value = '';
+            fetchGrid();
+        }
+        window.onload = fetchGrid;
+    </script>
+</body>
+</html>
