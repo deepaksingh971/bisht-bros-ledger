@@ -1,23 +1,26 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
-const app = express();
 
+const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-// --- YAHAN APNA MONGODB LINK DALO ---
-// Yaad rakhna: password ke special characters ko hatana ya replace karna
-const MONGO_URI = "mongodb+srv://deepak:YOUR_PASSWORD@cluster0.abcde.mongodb.net/BishtBros?retryWrites=true&w=majority";
+// --- MongoDB Connection ---
+const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
-    .then(() => {
-        console.log("✅ MongoDB Connected Successfully!");
-        migrateData(); // Database connect hote hi purana data bhejega
-    })
-    .catch(err => console.log("❌ Connection Error: ", err.message));
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => {
+    console.log("✅ MongoDB Connected Successfully!");
+    migrateData(); // Database connected → migrate old JSON data
+})
+.catch(err => console.log("❌ Connection Error: ", err.message));
 
-// Schemas (Data Ka Structure)
+// --- Schemas ---
 const UserSchema = new mongoose.Schema({ 
     mobile: { type: String, required: true }, 
     password: { type: String, required: true }, 
@@ -35,10 +38,9 @@ const RecordSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const Record = mongoose.model('Record', RecordSchema);
 
-// --- PURANA DATA (JSON) KO MONGODB MEIN DALNE KA FUNCTION ---
+// --- Data Migration ---
 async function migrateData() {
     try {
-        // Purane Users Transfer
         if (fs.existsSync('./users.json')) {
             const oldUsers = JSON.parse(fs.readFileSync('./users.json', 'utf8'));
             for (let user of oldUsers) {
@@ -46,7 +48,7 @@ async function migrateData() {
             }
             console.log("👤 Users migrated to MongoDB");
         }
-        // Purane Ledger Records Transfer
+
         if (fs.existsSync('./data.json')) {
             const oldRecords = JSON.parse(fs.readFileSync('./data.json', 'utf8'));
             for (let rec of oldRecords) {
@@ -60,7 +62,6 @@ async function migrateData() {
 }
 
 // --- API ROUTES ---
-
 // Signup
 app.post('/api/signup', async (req, res) => {
     try {
@@ -88,13 +89,13 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Get All Data
+// Get All Records
 app.get('/api/records', async (req, res) => {
     const records = await Record.find();
     res.json(records);
 });
 
-// Update/Add Record (Admin Only)
+// Add/Update Record (Admin Only)
 app.post('/api/records', async (req, res) => {
     const { name, amount, date, status, mobile, password } = req.body;
     const user = await User.findOne({ mobile, password });
