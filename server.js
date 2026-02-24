@@ -10,12 +10,12 @@ app.use(express.static('public'));
 // --- MongoDB Connection ---
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)  // options removed for Mongoose 7+
+mongoose.connect(MONGO_URI)
     .then(() => {
         console.log("✅ MongoDB Connected Successfully!");
-        migrateData(); // migrate old JSON data
+        migrateData();
     })
-    .catch(err => console.log("❌ Connection Error: ", err.message));
+    .catch(err => console.log("❌ Connection Error:", err.message));
 
 // --- Schemas ---
 const UserSchema = new mongoose.Schema({ 
