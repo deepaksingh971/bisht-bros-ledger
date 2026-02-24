@@ -10,15 +10,12 @@ app.use(express.static('public'));
 // --- MongoDB Connection ---
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => {
-    console.log("✅ MongoDB Connected Successfully!");
-    migrateData(); // Database connected → migrate old JSON data
-})
-.catch(err => console.log("❌ Connection Error: ", err.message));
+mongoose.connect(MONGO_URI)  // options removed for Mongoose 7+
+    .then(() => {
+        console.log("✅ MongoDB Connected Successfully!");
+        migrateData(); // migrate old JSON data
+    })
+    .catch(err => console.log("❌ Connection Error: ", err.message));
 
 // --- Schemas ---
 const UserSchema = new mongoose.Schema({ 
