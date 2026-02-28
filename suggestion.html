@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bisht Bros | Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060a12;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #ffffff;
+    --text2: rgba(255,255,255,0.5);
+    --text3: rgba(255,255,255,0.2);
+    --a: #3b82f6;
+    --a2: #06b6d4;
+    --g: #10b981;
+    --o: #f59e0b;
+    --r: #ef4444;
+    --p: #8b5cf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+  /* BG */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+  .bg-glow {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse 60% 40% at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 80% 70%, rgba(139,92,246,0.06) 0%, transparent 60%);
+  }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    padding: 40px 48px 0;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header-left h1 { font-size: clamp(48px, 8vw, 80px); line-height: 0.9; color: var(--text); }
+  .header-left h1 span { color: var(--a); }
+  .header-left p { font-size: 11px; letter-spacing: 0.3em; color: var(--text3); font-weight: 700; text-transform: uppercase; margin-top: 8px; }
+
+  .stats-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 20px; text-align: right;
+    min-width: 100px;
+  }
+  .stat-box .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 4px; }
+  .stat-box .val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; }
+
+  /* FILTERS */
+  .filters {
+    position: relative; z-index: 10;
+    padding: 32px 48px 0;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-btn {
+    padding: 7px 16px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; cursor: pointer; border: 1px solid var(--border);
+    background: var(--card); color: var(--text3);
+    font-family: 'Syne', sans-serif; transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--a); color: var(--text); }
+  .filter-btn.active { background: var(--a); border-color: var(--a); color: white; }
+  .filter-btn[data-f="high"].active { background: var(--r); border-color: var(--r); }
+  .filter-btn[data-f="medium"].active { background: var(--o); border-color: var(--o); }
+  .filter-btn[data-f="low"].active { background: var(--g); border-color: var(--g); }
+
+  /* GRID */
+  .grid {
+    position: relative; z-index: 10;
+    padding: 32px 48px 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 24px;
+    cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.2,0.64,1);
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent-color, var(--a)), transparent 60%);
+    opacity: 0; transition: opacity 0.3s; border-radius: 20px;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.12); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .card:hover::before { opacity: 0.04; }
+  .card.voted { border-color: var(--accent-color, var(--a)); }
+  .card.voted::before { opacity: 0.06; }
+  .card.hidden-card { display: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card-emoji { font-size: 32px; line-height: 1; flex-shrink: 0; }
+  .card-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; border: 1px solid;
+  }
+  .badge-high { color: var(--r); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+  .badge-medium { color: var(--o); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+  .badge-low { color: var(--g); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+  .badge-cat {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text3);
+  }
+
+  .card h3 { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+  .card p { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .effort { font-size: 10px; color: var(--text3); font-weight: 700; }
+  .effort span { color: var(--text2); }
+
+  /* VOTE BUTTON */
+  .vote-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px;
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    cursor: pointer; font-family: 'Syne', sans-serif;
+    transition: all 0.2s;
+  }
+  .vote-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .vote-btn.voted-btn { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: var(--a); }
+  .vote-btn .arrow { font-size: 14px; transition: transform 0.2s; }
+  .vote-btn:hover .arrow { transform: translateY(-2px); }
+
+  /* PROGRESS BAR */
+  .prog-wrap { margin-top: 12px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); font-weight: 700; margin-bottom: 5px; }
+  .prog-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+
+  /* SECTION HEADER */
+  .section-head {
+    position: relative; z-index: 10;
+    padding: 0 48px; margin-bottom: -8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-head h2 { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3); }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* EMPTY */
+  .empty-state {
+    position: relative; z-index: 10;
+    grid-column: 1/-1; text-align: center; padding: 60px 20px;
+    color: var(--text3); font-size: 13px; font-weight: 600;
+  }
+  .empty-state .big { font-size: 40px; margin-bottom: 12px; }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 999;
+    padding: 12px 22px; border-radius: 12px; font-size: 13px; font-weight: 700;
+    background: #0a0f1e; border: 1px solid rgba(16,185,129,0.4); color: var(--g);
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.34,1.4,0.64,1); pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) {
+    header, .filters, .grid, .section-head { padding-left: 20px; padding-right: 20px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div id="toast"></div>
+
+<header>
+  <div class="header-left">
+    <h1 class="logo">BISHT <span>BROS</span><br>ROADMAP</h1>
+    <p>Feature suggestions · Vote karo · Priority decide karo</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="lbl">Total Ideas</div>
+      <div class="val" id="totalCount" style="color:var(--a);">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="lbl">Votes Cast</div>
+      <div class="val" id="totalVotes" style="color:var(--g);">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="lbl">High Priority</div>
+      <div class="val" id="highCount" style="color:var(--r);">0</div>
+    </div>
+  </div>
+</header>
+
+<div class="filters">
+  <span style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-right:4px;">Filter:</span>
+  <button class="filter-btn active" data-f="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" data-f="high" onclick="setFilter('high',this)">🔴 High Priority</button>
+  <button class="filter-btn" data-f="medium" onclick="setFilter('medium',this)">🟡 Medium</button>
+  <button class="filter-btn" data-f="low" onclick="setFilter('low',this)">🟢 Nice to Have</button>
+  <button class="filter-btn" data-f="voted" onclick="setFilter('voted',this)">⭐ My Votes</button>
+  <button class="filter-btn" data-f="security" onclick="setFilter('security',this)">🔐 Security</button>
+  <button class="filter-btn" data-f="ux" onclick="setFilter('ux',this)">✨ UX</button>
+  <button class="filter-btn" data-f="feature" onclick="setFilter('feature',this)">⚡ Feature</button>
+  <button class="filter-btn" data-f="stats" onclick="setFilter('stats',this)">📊 Stats</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const SUGGESTIONS = [
+  {
+    id: 1, emoji: '⏰', title: 'Auto Monthly Reminder',
+    desc: 'Har mahine ki fixed date pe automatically WhatsApp reminder bheje sabhi pending members ko — manually Bulk WA press nahi karna padega. Cron job se schedule hoga.',
+    priority: 'high', cat: 'feature',
+    effort: 'Medium', color: 'var(--r)',
+    votes: 12
+  },
+  {
+    id: 2, emoji: '📝', title: 'Notes / Remark Field',
+    desc: 'Har payment ke saath ek short note — "Cash diya", "UPI se aaya", "Half payment" — taaki future mein koi confusion na ho aur proof rahe.',
+    priority: 'high', cat: 'feature',
+    effort: 'Easy', color: 'var(--r)',
+    votes: 9
+  },
+  {
+    id: 3, emoji: '💸', title: 'Partial Payment Support',
+    desc: 'Abhi sirf Done/Pending hai. Agar koi 250 deta hai 500 mein se toh track nahi hota. "Partial" status add karo with actual amount paid tracking.',
+    priority: 'high', cat: 'feature',
+    effort: 'Medium', color: 'var(--r)',
+    votes: 11
+  },
+  {
+    id: 4, emoji: '🚨', title: 'Defaulter Alert System',
+    desc: 'Jo member 2+ mahine se consistently Pending hai uska naam dashboard pe red highlight kare automatically. "⚠️ 3 months pending" badge — public shame works! 😄',
+    priority: 'medium', cat: 'stats',
+    effort: 'Easy', color: 'var(--o)',
+    votes: 14
+  },
+  {
+    id: 5, emoji: '📅', title: 'GitHub-style Contribution Grid',
+    desc: '12 mahine ka ek visual grid — green square = paid, orange = pending, grey = no record. Har member ka ek heat map. Visually bahut cool lagega aur motivating bhi.',
+    priority: 'medium', cat: 'stats',
+    effort: 'Medium', color: 'var(--o)',
+    votes: 8
+  },
+  {
+    id: 6, emoji: '🔑', title: 'PIN Lock (Mobile)',
+    desc: 'App open karne pe 4-digit PIN maange. Phone share hota ho toh extra security layer. Fingerprint bhi add kar sakte ho later with WebAuthn API.',
+    priority: 'medium', cat: 'security',
+    effort: 'Easy', color: 'var(--o)',
+    votes: 5
+  },
+  {
+    id: 7, emoji: '📋', title: 'Audit Log',
+    desc: 'Kaun admin ne kya change kiya — "Deepak ka status Rahul ne Done kiya 3 Feb ko 6:30pm pe." Accountability aur transparency ke liye bahut zaroori hai group mein.',
+    priority: 'medium', cat: 'security',
+    effort: 'Medium', color: 'var(--o)',
+    votes: 7
+  },
+  {
+    id: 8, emoji: '⚡', title: 'Session Timeout Warning',
+    desc: '8 ghante baad session expire hota hai bina warning ke. 5 minute pehle ek popup aaye "Session expire hone wala hai" taaki unsaved changes na jaayein.',
+    priority: 'low', cat: 'ux',
+    effort: 'Easy', color: 'var(--g)',
+    votes: 4
+  },
+  {
+    id: 9, emoji: '📊', title: 'Monthly Summary Auto-Message',
+    desc: 'Mahine ke end mein admin ko automatic WA summary bheje: "February: 7/9 paid ✅, ₹3500 collected 💰, ₹500 pending ⏳, Balance after expenses: ₹2800 🏦"',
+    priority: 'low', cat: 'feature',
+    effort: 'Medium', color: 'var(--g)',
+    votes: 6
+  },
+  {
+    id: 10, emoji: '🌐', title: 'PWA (Install as App)',
+    desc: 'Ek simple manifest.json + service worker se website ko phone pe install karne layak banao. Home screen pe icon, offline support — feel aayega real app jaisa.',
+    priority: 'low', cat: 'ux',
+    effort: 'Easy', color: 'var(--g)',
+    votes: 10
+  },
+  {
+    id: 11, emoji: '📱', title: 'Payment Screenshot Upload',
+    desc: 'Jab koi UPI payment kare toh screenshot upload kar sake proof ke liye. MongoDB GridFS ya Cloudinary mein store hoga. Admin verify karke Done mark kare.',
+    priority: 'low', cat: 'feature',
+    effort: 'Hard', color: 'var(--g)',
+    votes: 3
+  },
+  {
+    id: 12, emoji: '🔔', title: 'In-App Notifications',
+    desc: 'Jab koi payment ho, ya admin status change kare — toh baaki members ko real-time notification aaye. WebSocket ya Server-Sent Events se implement hoga.',
+    priority: 'low', cat: 'ux',
+    effort: 'Hard', color: 'var(--g)',
+    votes: 5
+  },
+];
+
+let votes = JSON.parse(localStorage.getItem('bb_votes') || '{}');
+let voteCounts = {};
+SUGGESTIONS.forEach(s => { voteCounts[s.id] = s.votes + (votes[s.id] ? 1 : 0); });
+
+let currentFilter = 'all';
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function vote(id, e) {
+  e.stopPropagation();
+  const wasVoted = votes[id];
+  if (wasVoted) {
+    delete votes[id];
+    voteCounts[id] = Math.max(0, voteCounts[id] - 1);
+    showToast('Vote removed');
+  } else {
+    votes[id] = true;
+    voteCounts[id] = (voteCounts[id] || 0) + 1;
+    showToast('Vote diya! ✓');
+  }
+  localStorage.setItem('bb_votes', JSON.stringify(votes));
+  renderGrid();
+  updateStats();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function effortDots(e) {
+  const map = { Easy: 1, Medium: 2, Hard: 3 };
+  const n = map[e] || 1;
+  return '●'.repeat(n) + '○'.repeat(3 - n);
+}
+
+function priorityLabel(p) {
+  if (p === 'high') return '<span class="badge badge-high">🔴 High</span>';
+  if (p === 'medium') return '<span class="badge badge-medium">🟡 Medium</span>';
+  return '<span class="badge badge-low">🟢 Nice to Have</span>';
+}
+
+function maxVotes() {
+  return Math.max(...Object.values(voteCounts), 1);
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  let filtered = SUGGESTIONS.filter(s => {
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'voted') return votes[s.id];
+    if (['high','medium','low'].includes(currentFilter)) return s.priority === currentFilter;
+    return s.cat === currentFilter;
+  });
+
+  // Sort by votes desc
+  filtered.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="big">🤷</div>Koi suggestion nahi is filter mein</div>`;
+    return;
+  }
+
+  const mv = maxVotes();
+  grid.innerHTML = filtered.map((s, i) => {
+    const isVoted = votes[s.id];
+    const vc = voteCounts[s.id] || 0;
+    const pct = Math.round((vc / mv) * 100);
+    return `
+    <div class="card ${isVoted ? 'voted' : ''}" style="--accent-color:${s.color};animation-delay:${i * 40}ms">
+      <div class="card-top">
+        <div class="card-emoji">${s.emoji}</div>
+        <div class="card-badges">
+          ${priorityLabel(s.priority)}
+          <span class="badge-cat badge">${s.cat}</span>
+        </div>
+      </div>
+      <h3>${s.title}</h3>
+      <p>${s.desc}</p>
+      <div class="prog-wrap">
+        <div class="prog-label"><span>Community Interest</span><span>${vc} votes</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color};"></div></div>
+      </div>
+      <div class="card-footer">
+        <div class="effort">Effort: <span>${effortDots(s.effort)} ${s.effort}</span></div>
+        <button class="vote-btn ${isVoted ? 'voted-btn' : ''}" onclick="vote(${s.id}, event)">
+          <span class="arrow">${isVoted ? '★' : '☆'}</span>
+          ${isVoted ? 'Voted' : 'Vote'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  document.getElementById('totalCount').textContent = SUGGESTIONS.length;
+  document.getElementById('totalVotes').textContent = Object.keys(votes).length;
+  document.getElementById('highCount').textContent = SUGGESTIONS.filter(s => s.priority === 'high').length;
+}
+
+renderGrid();
+updateStats();
+</script>
+</body>
+</html>
