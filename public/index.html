@@ -51,6 +51,11 @@
         .amt-inp { background:transparent; border:none; outline:none; color:var(--a); font-weight:700; font-size:14px; width:70px; text-align:center; font-family:'Syne',sans-serif; }
         .amt-inp:not([disabled]):focus { background:rgba(59,130,246,0.1); border-radius:6px; }
         .amt-inp[disabled] { opacity:0.4; }
+        .date-inp { background:transparent; border:1px solid var(--border); border-radius:8px; outline:none; color:var(--g); font-weight:600; font-size:11px; font-family:'Syne',sans-serif; padding:4px 8px; cursor:pointer; transition:all 0.15s; }
+        .date-inp:not([disabled]):hover { border-color:var(--a); background:rgba(59,130,246,0.06); }
+        .date-inp:not([disabled]):focus { border-color:var(--a); box-shadow:0 0 0 2px rgba(59,130,246,0.15); }
+        .date-inp[disabled] { opacity:0.25; cursor:not-allowed; border-color:transparent; }
+        .date-inp::-webkit-calendar-picker-indicator { filter:invert(0.5); cursor:pointer; }
         .st-sel { background:transparent; border:none; outline:none; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; font-family:'Syne',sans-serif; cursor:pointer; }
         .st-sel option { background:var(--modal); color:var(--text); }
         .save-btn { background:var(--inp); border:1px solid var(--border); color:var(--text); padding:6px 16px; border-radius:8px; font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.15s; font-family:'Syne',sans-serif; }
@@ -221,7 +226,7 @@
 
         <!-- LEDGER -->
         <div id="ledgerView" class="table-wrap">
-            <div class="glass-table"><table><thead><tr><th style="text-align:left;">#</th><th style="text-align:left;">Member</th><th>Amount</th><th>Status</th><th>Paid Date</th><th style="text-align:right;">Action</th></tr></thead><tbody id="entryBody"></tbody></table></div>
+            <div class="glass-table"><table><thead><tr><th style="text-align:left;">#</th><th style="text-align:left;">Member</th><th>Amount</th><th>Status</th><th>Paid On</th><th style="text-align:right;">Action</th></tr></thead><tbody id="entryBody"></tbody></table></div>
             <div id="expenseSection" style="margin-top:20px;display:none;">
                 <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">📦 Expenses This Month</div>
                 <div class="glass-table"><table><thead><tr><th style="text-align:left;">Description</th><th>Category</th><th>Amount</th><th style="text-align:right;">Del</th></tr></thead><tbody id="expenseBody"></tbody></table></div>
@@ -302,13 +307,11 @@ async function loadData(){try{const[rR,eR]=await Promise.all([fetch('/api/record
 // RENDER LEDGER
 function renderLedger(){const body=document.getElementById('entryBody');body.innerHTML='';let mT=0,yT=0,paid=0;const isAdmin=currentUser.role==='admin';allData.forEach(r=>{if(r.date?.includes(currentYear)&&r.status==='Done')yT+=Number(r.amount)||0;});
 MEMBERS.forEach((m,i)=>{const rec=allData.find(r=>r.name===m.name&&r.date===selectedMonth);const status=rec?rec.status:'Pending';const amt=rec?Number(rec.amount):defaultAmount;const paidDate=rec?.paidDate||'';if(status==='Done'){mT+=amt;paid++;}const sc=status==='Done'?'var(--g)':'var(--o)';
-const paidDateDisplay = status==='Done'
-  ? (paidDate ? `<span style="font-size:11px;color:var(--g);font-weight:600;">${paidDate}</span>` : `<span style="font-size:10px;color:var(--text3);">—</span>`)
-  : `<span style="font-size:10px;color:var(--text3);">—</span>`;
-const paidDateInput = isAdmin
-  ? `<input type="date" id="pd-${m.id}" value="${paidDate}" style="background:transparent;border:none;outline:none;color:var(--a);font-size:11px;font-weight:600;font-family:'Syne',sans-serif;width:110px;" ${status!=='Done'?'disabled style="opacity:0.3;pointer-events:none;"':''}>`
-  : paidDateDisplay;
-body.innerHTML+=`<tr style="animation-delay:${i*30}ms"><td style="color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;" onclick="openDetail('${m.name}')">${m.id}</td><td style="font-weight:700;cursor:pointer;" onclick="openDetail('${m.name}')">${m.name}</td><td style="text-align:center;"><span style="color:var(--text3);font-size:12px;">₹</span><input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin?'disabled':''} class="amt-inp"></td><td style="text-align:center;"><select id="st-${m.id}" ${!isAdmin?'disabled':''} class="st-sel" style="color:${sc}" onchange="onStatusChange('${m.id}',this)">${'<option value="Pending"'+(status==='Pending'?' selected':'')+'>'+'PENDING</option><option value="Done"'+(status==='Done'?' selected':'')+'>DONE</option>'}</select></td><td style="text-align:center;">${paidDateInput}</td><td style="text-align:right;">${isAdmin?`<button class="save-btn" onclick="saveEntry('${m.name}','${m.id}',this)">Save</button>`:'<span style="font-size:8px;color:var(--text3);font-weight:700;text-transform:uppercase;">PROTECTED</span>'}</td></tr>`;});
+const isDone=status==='Done';
+const dateCell=isAdmin
+  ? `<input type="date" id="pd-${m.id}" value="${paidDate}" class="date-inp" ${isDone?'':'disabled'} onchange="">`
+  : (isDone&&paidDate?`<span style="font-size:11px;color:var(--g);font-weight:600;">${paidDate}</span>`:`<span style="color:var(--text3);font-size:12px;">—</span>`);
+body.innerHTML+=`<tr style="animation-delay:${i*30}ms"><td style="color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;" onclick="openDetail('${m.name}')">${m.id}</td><td style="font-weight:700;cursor:pointer;" onclick="openDetail('${m.name}')">${m.name}</td><td style="text-align:center;"><span style="color:var(--text3);font-size:12px;">₹</span><input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin?'disabled':''} class="amt-inp"></td><td style="text-align:center;"><select id="st-${m.id}" ${!isAdmin?'disabled':''} class="st-sel" style="color:${sc}" onchange="onStatusChange('${m.id}',this)"><option value="Pending"${status==='Pending'?' selected':''}>PENDING</option><option value="Done"${status==='Done'?' selected':''}>DONE</option></select></td><td style="text-align:center;">${dateCell}</td><td style="text-align:right;">${isAdmin?`<button class="save-btn" onclick="saveEntry('${m.name}','${m.id}',this)">Save</button>`:'<span style="font-size:8px;color:var(--text3);font-weight:700;text-transform:uppercase;">PROTECTED</span>'}</td></tr>`;});
 document.getElementById('monthTotal').textContent=`₹${mT.toLocaleString('en-IN')}`;document.getElementById('yearTotal').textContent=`₹${yT.toLocaleString('en-IN')}`;document.getElementById('paidCount').textContent=`${paid}/${MEMBERS.length}`;
 const mExp=expenses.filter(e=>e.date===selectedMonth);const eSum=mExp.reduce((s,e)=>s+Number(e.amount),0);document.getElementById('expTotal').textContent=`₹${eSum.toLocaleString('en-IN')}`;document.getElementById('balTotal').textContent=`₹${(mT-eSum).toLocaleString('en-IN')}`;
 if(mExp.length>0&&isAdmin){document.getElementById('expenseSection').style.display='block';document.getElementById('expenseBody').innerHTML=mExp.map(e=>`<tr><td style="font-weight:600;">${e.description}</td><td style="text-align:center;font-size:11px;color:var(--text2);">${e.category}</td><td style="text-align:center;color:var(--o);font-weight:700;">₹${Number(e.amount).toLocaleString('en-IN')}</td><td style="text-align:right;"><button class="save-btn" onclick="deleteExpense('${e._id}')" style="color:var(--r);">✕</button></td></tr>`).join('');}else document.getElementById('expenseSection').style.display='none';
@@ -325,11 +328,25 @@ function renderStats(){const lb=[...MEMBERS].map(m=>({...m,total:allData.filter(
 // YEARLY
 function renderYearly(){const head=document.getElementById('yearlyHead');const body=document.getElementById('yearlyBody');const foot=document.getElementById('yearlyFoot');const th=(txt,color='var(--text3)')=>`<th style="padding:12px 10px;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${color};background:var(--row);border-bottom:1px solid var(--border);white-space:nowrap;">${txt}</th>`;head.innerHTML=th('Month','var(--text3)')+MEMBERS.map(m=>th(m.name.split(' ')[0])).join('')+th('Total','var(--o)');let grand=0;const mT=new Array(MEMBERS.length).fill(0);body.innerHTML=MONTHS.map(mn=>{const mName=`${mn} ${currentYear}`;let rs=0;const cells=MEMBERS.map((m,i)=>{const rec=allData.find(r=>r.name===m.name&&r.date===mName);if(rec?.status==='Done'){const a=Number(rec.amount);rs+=a;mT[i]+=a;return`<td style="padding:10px;text-align:center;color:var(--g);font-weight:700;font-size:12px;border-bottom:1px solid var(--border);">₹${a}</td>`;}if(rec?.status==='Pending')return`<td style="padding:10px;text-align:center;color:var(--o);font-size:11px;border-bottom:1px solid var(--border);">⏳</td>`;return`<td style="padding:10px;text-align:center;color:var(--text3);border-bottom:1px solid var(--border);">—</td>`;}).join('');grand+=rs;return`<tr><td style="padding:10px 16px;font-weight:700;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);white-space:nowrap;">${mn}</td>${cells}<td style="padding:10px 16px;text-align:center;font-weight:700;color:var(--o);border-bottom:1px solid var(--border);">₹${rs.toLocaleString('en-IN')}</td></tr>`;}).join('');foot.innerHTML=`<tr style="background:var(--row);"><td style="padding:12px 16px;font-weight:800;font-size:12px;color:var(--text);">TOTAL</td>${mT.map(t=>`<td style="padding:12px 10px;text-align:center;font-weight:700;color:var(--a);">₹${t.toLocaleString('en-IN')}</td>`).join('')}<td style="padding:12px 16px;text-align:center;font-weight:800;color:var(--o);font-size:14px;">₹${grand.toLocaleString('en-IN')}</td></tr>`;}
 
-// STATUS CHANGE - toggle date input
-function onStatusChange(id, sel){sel.style.color=sel.value==='Done'?'var(--g)':'var(--o)';const pdInp=document.getElementById(`pd-${id}`);if(pdInp){if(sel.value==='Done'){pdInp.disabled=false;pdInp.style.opacity='1';pdInp.style.pointerEvents='auto';if(!pdInp.value)pdInp.value=new Date().toISOString().split('T')[0];}else{pdInp.disabled=true;pdInp.style.opacity='0.3';pdInp.value='';}}}
+// STATUS CHANGE
+function onStatusChange(id,sel){
+  sel.style.color=sel.value==='Done'?'var(--g)':'var(--o)';
+  const pd=document.getElementById(`pd-${id}`);
+  if(!pd)return;
+  if(sel.value==='Done'){
+    pd.disabled=false;
+    if(!pd.value){const t=new Date();pd.value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+  } else {
+    pd.disabled=true;
+    pd.value='';
+  }
+}
 
 // SAVE
 async function saveEntry(name,id,btn){const orig=btn.textContent;btn.textContent='...';btn.disabled=true;const pdInp=document.getElementById(`pd-${id}`);const paidDate=pdInp?pdInp.value:'';try{const res=await fetch('/api/records',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,amount:document.getElementById(`amt-${id}`).value,status:document.getElementById(`st-${id}`).value,paidDate,date:selectedMonth,mobile:currentUser.mobile,token:currentUser.token})});if(res.ok){toast(`${name.split(' ')[0]} updated ✓`);loadData();}else{const d=await res.json();toast(d.error||'Save failed','e');}}catch{toast('Server unreachable','e');}finally{btn.textContent=orig;btn.disabled=false;}}
+
+// CHANGE PASSWORD
+async function changePassword(){const old=document.getElementById('oldPwd').value;const nw=document.getElementById('newPwd').value;const cnf=document.getElementById('cnfPwd').value;if(!old||!nw||!cnf)return toast('Sab fields bharo','e');if(nw!==cnf)return toast('New passwords match nahi kar rahe!','e');if(nw.length<6)return toast('Password min 6 characters','e');try{const res=await fetch('/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:currentUser.mobile,token:currentUser.token,oldPassword:old,newPassword:nw})});const d=await res.json();if(d.success){toast('Password change ho gaya! Dobara login karo ✓');setTimeout(()=>logout(),1500);}else toast(d.error||'Failed','e');}catch{toast('Server unreachable','e');}}
 
 // EXPENSE
 async function saveExpense(){const desc=document.getElementById('expDesc').value.trim();const amt=document.getElementById('expAmt').value;const date=document.getElementById('expDate').value.trim();const cat=document.getElementById('expCat').value;if(!desc||!amt)return toast('Pura bharo!','e');try{const res=await fetch('/api/expenses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,amount:Number(amt),date,category:cat,mobile:currentUser.mobile,token:currentUser.token})});if(res.ok){toast('Expense saved ✓');closeModal('expModal');document.getElementById('expDesc').value='';document.getElementById('expAmt').value='';loadData();}else{const d=await res.json();toast(d.error||'Failed','e');}}catch{toast('Server unreachable','e');}}
@@ -347,7 +364,28 @@ async function removeMember(idx){if(!confirm(`Remove ${MEMBERS[idx].name}?`))ret
 async function saveMembersServer(){try{await fetch('/api/members',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({members:MEMBERS,mobile:currentUser.mobile,token:currentUser.token})});}catch{}}
 
 // SETTINGS
-function openSettings(){document.getElementById('settingsContent').innerHTML=`<div style="margin-bottom:22px;"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Default Amount</div><div style="display:flex;gap:8px;"><input class="inp" id="defAmtInp" type="number" value="${defaultAmount}" style="margin-bottom:0;flex:1;"><button onclick="saveDefAmt()" style="background:var(--a);border:none;border-radius:12px;padding:0 16px;color:white;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Save</button></div><div style="font-size:11px;color:var(--text3);margin-top:6px;">Naye records ka default amount</div></div><div style="margin-bottom:22px;"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Theme</div><button onclick="toggleTheme()" style="width:100%;padding:10px;border-radius:12px;background:var(--inp);border:1px solid var(--border);color:var(--text);font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Toggle Light / Dark Mode</button></div><div><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">User Management</div><div id="userListEl"></div></div>`;loadUserList();openPanel('settingsPanel');}
+function openSettings(){document.getElementById('settingsContent').innerHTML=`
+<div style="margin-bottom:24px;">
+  <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">💰 Default Amount</div>
+  <div style="display:flex;gap:8px;"><input class="inp" id="defAmtInp" type="number" value="${defaultAmount}" style="margin-bottom:0;flex:1;"><button onclick="saveDefAmt()" style="background:var(--a);border:none;border-radius:12px;padding:0 16px;color:white;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Save</button></div>
+  <div style="font-size:11px;color:var(--text3);margin-top:6px;">Naye records ka default amount</div>
+</div>
+<div style="margin-bottom:24px;">
+  <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">🎨 Theme</div>
+  <button onclick="toggleTheme()" style="width:100%;padding:10px;border-radius:12px;background:var(--inp);border:1px solid var(--border);color:var(--text);font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Toggle Light / Dark Mode</button>
+</div>
+<div style="margin-bottom:24px;">
+  <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">🔑 Change Password</div>
+  <input class="inp" id="oldPwd" type="password" placeholder="Purana password" style="margin-bottom:8px;">
+  <input class="inp" id="newPwd" type="password" placeholder="Naya password (min 6)" style="margin-bottom:8px;">
+  <input class="inp" id="cnfPwd" type="password" placeholder="Naya password confirm karo" style="margin-bottom:8px;">
+  <button onclick="changePassword()" style="width:100%;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--g);border-radius:12px;padding:10px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;transition:all 0.2s;" onmouseover="this.style.background='rgba(16,185,129,0.25)'" onmouseout="this.style.background='rgba(16,185,129,0.15)'">Password Change Karo</button>
+  <div style="font-size:11px;color:var(--text3);margin-top:6px;">⚠ Password change hone ke baad dobara login karna hoga</div>
+</div>
+<div>
+  <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">👥 User Management</div>
+  <div id="userListEl"></div>
+</div>`;loadUserList();openPanel('settingsPanel');}
 function saveDefAmt(){const val=Number(document.getElementById('defAmtInp').value);if(!val||val<0)return toast('Valid amount daalo','e');defaultAmount=val;localStorage.setItem('bbDefaultAmt',val);toast(`Default ₹${val} set ✓`);renderLedger();}
 async function loadUserList(){try{const res=await fetch('/api/users',{headers:{'x-mobile':currentUser.mobile,'x-token':currentUser.token}});if(!res.ok)return;const users=await res.json();document.getElementById('userListEl').innerHTML=users.map(u=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;"><div style="font-weight:700;font-size:13px;color:var(--text);">${u.name}</div><div style="font-size:10px;color:var(--text3);">${u.mobile}</div></div><span class="tag ${u.role==='admin'?'tag-admin':'tag-viewer'}">${u.role}</span>${u.mobile!==currentUser.mobile?`<button onclick="toggleRole('${u.mobile}','${u.role}')" style="background:var(--inp);border:1px solid var(--border);color:var(--text2);padding:5px 10px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">${u.role==='admin'?'→ Viewer':'→ Admin'}</button>`:'<span style="font-size:10px;color:var(--text3);">You</span>'}</div>`).join('');}catch{}}
 async function toggleRole(mobile,role){const newRole=role==='admin'?'viewer':'admin';try{const res=await fetch('/api/users/role',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({targetMobile:mobile,newRole,mobile:currentUser.mobile,token:currentUser.token})});if(res.ok){toast(`Role updated to ${newRole} ✓`);loadUserList();}else{const d=await res.json();toast(d.error||'Failed','e');}}catch{toast('Failed','e');}}
