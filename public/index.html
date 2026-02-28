@@ -472,21 +472,21 @@ function renderLedger() {
         if (status === 'Done') { monthTotal += amt; paid++; }
         const sc = status === 'Done' ? 'var(--green)' : 'var(--orange)';
 
-        body.innerHTML += `<tr onclick="openDetail('${m.name}')" style="animation-delay:${i*30}ms">
-            <td style="color:rgba(255,255,255,0.2); font-size:10px; font-weight:700;">${m.id}</td>
-            <td style="font-weight:700;">${m.name}</td>
+        body.innerHTML += `<tr style="animation-delay:${i*30}ms">
+            <td style="color:rgba(255,255,255,0.2); font-size:10px; font-weight:700; cursor:pointer;" onclick="openDetail('${m.name}')">${m.id}</td>
+            <td style="font-weight:700; cursor:pointer;" onclick="openDetail('${m.name}')">${m.name}</td>
             <td style="text-align:center;">
                 <span style="color:rgba(255,255,255,0.3); font-size:12px;">₹</span>
-                <input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin?'disabled':''} class="amt-inp" onclick="event.stopPropagation()">
+                <input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin?'disabled':''} class="amt-inp">
             </td>
             <td style="text-align:center;">
                 <select id="st-${m.id}" ${!isAdmin?'disabled':''} class="status-sel" style="color:${sc}"
-                    onchange="this.style.color=this.value==='Done'?'var(--green)':'var(--orange)'; event.stopPropagation()">
+                    onchange="this.style.color=this.value==='Done'?'var(--green)':'var(--orange)'">
                     <option value="Pending" ${status==='Pending'?'selected':''}>PENDING</option>
                     <option value="Done" ${status==='Done'?'selected':''}>DONE</option>
                 </select>
             </td>
-            <td style="text-align:right;" onclick="event.stopPropagation()">
+            <td style="text-align:right;">
                 ${isAdmin ? `<button class="save-btn" onclick="saveEntry('${m.name}','${m.id}',this)">Save</button>` : '<span style="font-size:8px;color:rgba(255,255,255,0.1);font-weight:700;text-transform:uppercase;">PROTECTED</span>'}
             </td>
         </tr>`;
@@ -718,4 +718,3 @@ if (saved) { try { currentUser = JSON.parse(saved); initDash(); } catch { sessio
 </script>
 </body>
 </html>
-
