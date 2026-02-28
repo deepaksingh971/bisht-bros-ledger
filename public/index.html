@@ -3,100 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bisht Bros | Premium Dashboard</title>
+    <title>Bisht Bros | Premium Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: url('friends.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: white; height: 100vh; overflow: hidden;
+        :root {
+            --accent: #3b82f6;
+            --accent-glow: rgba(59,130,246,0.3);
         }
-        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: -1; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .login-card { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #080c14;
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-mesh {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,130,246,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 90%, rgba(99,102,241,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(14,165,233,0.05) 0%, transparent 70%);
+            animation: meshShift 12s ease-in-out infinite alternate;
+        }
+        @keyframes meshShift {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        /* Grid overlay */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+        .glass-strong {
+            background: rgba(8,12,20,0.85);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Auth Card */
+        .auth-card {
+            background: rgba(10,15,28,0.95);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(59,130,246,0.15);
+            box-shadow: 0 0 80px rgba(59,130,246,0.08), 0 40px 80px rgba(0,0,0,0.5);
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 14px 20px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-field:focus {
+            border-color: var(--accent);
+            background: rgba(59,130,246,0.05);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .input-field::placeholder { color: rgba(255,255,255,0.2); }
+
+        .btn-primary {
+            width: 100%; background: var(--accent);
+            padding: 14px; border-radius: 14px;
+            font-weight: 700; font-size: 14px;
+            border: none; color: white; cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(59,130,246,0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* Logo */
+        .logo-text { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; flex-shrink: 0;
+            background: rgba(8,12,20,0.95);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            padding: 32px 20px;
+            height: 100vh;
+        }
+
+        .month-btn {
+            width: 100%; text-align: left;
+            padding: 10px 16px; border-radius: 10px;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            cursor: pointer; border: none;
+            background: transparent; color: rgba(255,255,255,0.3);
+            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+        }
+        .month-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+        .month-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table th {
+            font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; color: rgba(255,255,255,0.2);
+            padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+        }
+        .data-table td { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .data-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        .status-done { color: #34d399; }
+        .status-pending { color: #f97316; }
+
+        .amount-input {
+            background: transparent; border: none; outline: none;
+            color: var(--accent); font-weight: 700; font-size: 15px;
+            width: 80px; text-align: center;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .amount-input:not([disabled]):focus { 
+            background: rgba(59,130,246,0.08); border-radius: 8px; 
+        }
+        .amount-input[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+        .status-select {
+            background: transparent; border: none; outline: none;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            cursor: pointer; font-family: 'DM Sans', sans-serif;
+        }
+        .status-select option { background: #1a1a2e; color: white; }
+
+        .save-btn {
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 7px 18px; border-radius: 8px;
+            font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; cursor: pointer;
+            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+        .save-btn:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        /* Stat card */
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; padding: 16px 22px;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 32px; right: 32px; z-index: 9999;
+            padding: 14px 24px; border-radius: 12px;
+            font-size: 13px; font-weight: 600;
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.success { border-color: rgba(52,211,153,0.3); color: #34d399; }
+        #toast.error { border-color: rgba(248,113,113,0.3); color: #f87171; }
+
+        /* Page transitions */
+        .page { transition: opacity 0.3s ease; }
+        .page.hidden { opacity: 0; pointer-events: none; display: none !important; }
+
+        /* Spinner */
+        .spinner {
+            width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: white; border-radius: 50%;
+            animation: spin 0.6s linear infinite; display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Year select */
+        .year-select {
+            width: 100%; background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 10px 14px;
+            color: white; font-size: 12px; font-weight: 600;
+            outline: none; cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .year-select option { background: #080c14; }
+
+        select { appearance: none; -webkit-appearance: none; }
+
+        /* Slide-in animation for rows */
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .data-table tbody tr { animation: rowIn 0.2s ease forwards; }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body>
+    <div class="bg-mesh"></div>
+    <div class="bg-grid"></div>
+    <div id="toast"></div>
 
-    <div class="overlay"></div>
+    <!-- AUTH SCREEN -->
+    <div id="authScreen" class="page relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div class="auth-card w-full max-w-sm rounded-3xl p-10">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <h1 class="logo-text text-5xl mb-1">BISHT <span style="color: var(--accent)">BROS</span></h1>
+                <p style="color: rgba(255,255,255,0.25); font-size: 9px; letter-spacing: 0.45em; font-weight: 700; text-transform: uppercase;">Digital Ledger System</p>
+            </div>
 
-    <div id="authScreen" class="w-full max-w-md p-6">
-        <div class="login-card p-10 rounded-[2.5rem] shadow-2xl text-center">
-            <h1 class="text-4xl font-black italic tracking-tighter mb-2">BISHT <span class="text-blue-500">BROS</span></h1>
-            <p class="text-white/30 text-[10px] uppercase tracking-[0.4em] mb-10 font-bold">Digital Ledger System</p>
-
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                <input type="text" id="loginMobile" placeholder="Mobile Number" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all">
-                <input type="password" id="loginPassword" placeholder="Password" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all">
-                <button type="submit" class="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">Login</button>
-                <p class="text-xs text-white/30 pt-4">New member? <span onclick="toggleAuth('signup')" class="text-blue-400 cursor-pointer font-bold">Register</span></p>
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+                <input type="tel" id="loginMobile" class="input-field" placeholder="Mobile Number" required>
+                <input type="password" id="loginPassword" class="input-field" placeholder="Password" required>
+                <button type="submit" class="btn-primary mt-2" id="loginBtn">Login</button>
+                <p style="text-align:center; font-size: 12px; color: rgba(255,255,255,0.25); padding-top: 8px;">
+                    New member? <span onclick="toggleAuth('signup')" style="color: var(--accent); cursor: pointer; font-weight: 700;">Register</span>
+                </p>
             </form>
 
-            <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-4 hidden">
-                <input type="text" id="signupName" placeholder="Full Name" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none">
-                <input type="text" id="signupMobile" placeholder="Mobile" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none">
-                <input type="password" id="signupPassword" placeholder="Set Password" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none">
-                <button type="submit" class="w-full bg-white text-black py-4 rounded-2xl font-bold">Create Account</button>
-                <p class="text-xs text-white/30 pt-4"><span onclick="toggleAuth('login')" class="text-blue-400 cursor-pointer font-bold">Back to Login</span></p>
+            <!-- Signup Form -->
+            <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-3 hidden">
+                <input type="text" id="signupName" class="input-field" placeholder="Full Name" required>
+                <input type="tel" id="signupMobile" class="input-field" placeholder="Mobile Number" required>
+                <input type="password" id="signupPassword" class="input-field" placeholder="Set Password (min 6 chars)" minlength="6" required>
+                <button type="submit" class="btn-primary mt-2" id="signupBtn">Create Account</button>
+                <p style="text-align:center; font-size: 12px; color: rgba(255,255,255,0.25); padding-top: 8px;">
+                    <span onclick="toggleAuth('login')" style="color: var(--accent); cursor: pointer; font-weight: 700;">← Back to Login</span>
+                </p>
             </form>
         </div>
     </div>
 
-    <div id="dashboardScreen" class="hidden w-full h-full flex flex-col lg:flex-row overflow-hidden">
-        <aside class="w-full lg:w-72 bg-black/40 backdrop-blur-3xl border-r border-white/5 p-8 flex flex-col shrink-0">
-            <div class="mb-10">
-                <h2 class="text-2xl font-black italic tracking-tighter">BISHT <span class="text-blue-500">BROS</span></h2>
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboardScreen" class="page hidden relative z-10 flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="mb-8">
+                <h2 class="logo-text text-3xl">BISHT <span style="color:var(--accent)">BROS</span></h2>
+                <p id="sidebarUser" style="font-size:10px; color: rgba(255,255,255,0.3); font-weight:600; letter-spacing:0.1em; margin-top:4px; text-transform:uppercase;"></p>
             </div>
 
-            <div class="mb-6">
-                <label class="text-[10px] text-white/30 uppercase font-black mb-2 block tracking-widest">Select Year</label>
-                <select id="yearSelector" onchange="changeYear(this.value)" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold outline-none cursor-pointer">
+            <div class="mb-5">
+                <label style="font-size:9px; font-weight:700; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; display:block; margin-bottom:8px;">Select Year</label>
+                <select id="yearSelector" class="year-select" onchange="changeYear(this.value)">
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
                 </select>
             </div>
 
-            <div id="monthList" class="flex-1 overflow-y-auto space-y-1 custom-scroll pr-2 mb-20"></div>
+            <div style="flex:1; overflow-y:auto; margin-bottom:16px;" id="monthList" class="space-y-0.5 pr-1"></div>
 
-            <button onclick="logout()" class="w-full py-3 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">Logout</button>
-        </aside>
+            <button onclick="logout()" style="width:100%; padding:11px; border-radius:10px; background:rgba(239,68,68,0.08); color: rgba(239,68,68,0.7); font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; border: 1px solid rgba(239,68,68,0.15); cursor:pointer; transition: all 0.2s; font-family:'DM Sans',sans-serif;"
+                onmouseover="this.style.background='rgba(239,68,68,0.15)'; this.style.color='rgb(239,68,68)'"
+                onmouseout="this.style.background='rgba(239,68,68,0.08)'; this.style.color='rgba(239,68,68,0.7)'">
+                Logout
+            </button>
+        </div>
 
-        <main class="flex-1 flex flex-col">
-            <header class="p-8 lg:p-12 flex justify-between items-center border-b border-white/5 bg-black/10">
+        <!-- MAIN AREA -->
+        <main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+            <!-- Header -->
+            <header style="padding: 28px 40px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; background: rgba(8,12,20,0.6); backdrop-filter:blur(20px); flex-shrink:0;">
                 <div>
-                    <h3 id="activeMonthTitle" class="text-4xl font-black tracking-tighter uppercase">Month</h3>
-                    <p id="userNameDisplay" class="text-blue-400 text-[10px] font-bold uppercase tracking-widest mt-1">User Name</p>
+                    <h3 id="activeMonthTitle" class="logo-text" style="font-size: 42px; line-height:1; color:white;">—</h3>
+                    <p id="userNameDisplay" style="font-size:10px; font-weight:600; letter-spacing:0.12em; color:var(--accent); text-transform:uppercase; margin-top:4px;"></p>
                 </div>
-                
-                <div class="flex gap-6">
-                    <div class="text-right">
-                        <p class="text-[10px] text-white/30 uppercase font-black mb-1">Year Total</p>
-                        <p id="yearlyTotalBadge" class="text-3xl font-black tracking-tighter text-blue-500">₹0</p>
+                <div style="display:flex; gap:20px; align-items:center;">
+                    <div class="stat-card text-right">
+                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Year Total</p>
+                        <p id="yearlyTotalBadge" class="logo-text" style="font-size:30px; color:var(--accent); line-height:1;">₹0</p>
                     </div>
-                    <div class="text-right border-l border-white/10 pl-6">
-                        <p class="text-[10px] text-white/30 uppercase font-black mb-1">Month Total</p>
-                        <p id="totalBadge" class="text-3xl font-black tracking-tighter">₹0</p>
+                    <div class="stat-card text-right">
+                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Month Total</p>
+                        <p id="totalBadge" class="logo-text" style="font-size:30px; color:white; line-height:1;">₹0</p>
+                    </div>
+                    <div class="stat-card text-right">
+                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Paid</p>
+                        <p id="paidCountBadge" class="logo-text" style="font-size:30px; color: #34d399; line-height:1;">0/9</p>
                     </div>
                 </div>
             </header>
 
-            <div class="flex-1 p-8 lg:p-12 overflow-y-auto custom-scroll">
-                <div class="glass rounded-[2.5rem] overflow-hidden shadow-2xl">
-                    <table class="w-full text-left">
-                        <thead class="bg-white/5 text-[10px] font-black text-white/20 uppercase tracking-widest border-b border-white/5">
+            <!-- Table -->
+            <div style="flex:1; padding: 32px 40px; overflow-y:auto;">
+                <div class="glass" style="border-radius:24px; overflow:hidden;">
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <th class="px-10 py-6">Personnel</th>
-                                <th class="px-10 py-6 text-center">Amount</th>
-                                <th class="px-10 py-6 text-center">Status</th>
-                                <th class="px-10 py-6 text-right">Access</th>
+                                <th style="text-align:left">#</th>
+                                <th style="text-align:left">Member</th>
+                                <th>Amount (₹)</th>
+                                <th>Status</th>
+                                <th style="text-align:right">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="entryBody" class="divide-y divide-white/5"></tbody>
+                        <tbody id="entryBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -105,15 +330,32 @@
 
     <script>
         const members = [
-            { id: 'BB-01', name: 'Deepak Singh Bisht' }, { id: 'BB-02', name: 'Lokesh Singh Bisht' },
-            { id: 'BB-03', name: 'Suraj Singh Bisht' }, { id: 'BB-04', name: 'Karan Singh Bisht' },
-            { id: 'BB-05', name: 'Himanshu Bisht' }, { id: 'BB-06', name: 'Gaurav Bisht' },
-            { id: 'BB-07', name: 'Rahul Bisht' }, { id: 'BB-08', name: 'Saurav Bisht' },
+            { id: 'BB-01', name: 'Deepak Singh Bisht' },
+            { id: 'BB-02', name: 'Lokesh Singh Bisht' },
+            { id: 'BB-03', name: 'Suraj Singh Bisht' },
+            { id: 'BB-04', name: 'Karan Singh Bisht' },
+            { id: 'BB-05', name: 'Himanshu Bisht' },
+            { id: 'BB-06', name: 'Gaurav Bisht' },
+            { id: 'BB-07', name: 'Rahul Bisht' },
+            { id: 'BB-08', name: 'Saurav Bisht' },
             { id: 'BB-09', name: 'Pankaj Bisht' }
         ];
 
-        let currentYear = "2026", selectedMonth = "March 2026", currentUser = null;
+        const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+        let currentYear = "2026";
+        let selectedMonth = "March 2026";
+        let currentUser = null;
+
+        // ─── TOAST ───
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `show ${type}`;
+            setTimeout(() => { t.className = ''; }, 3000);
+        }
+
+        // ─── AUTH ───
         function toggleAuth(type) {
             document.getElementById('loginForm').classList.toggle('hidden', type === 'signup');
             document.getElementById('signupForm').classList.toggle('hidden', type === 'login');
@@ -121,86 +363,238 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mobile: document.getElementById('loginMobile').value, password: document.getElementById('loginPassword').value})});
-            const data = await res.json();
-            if(res.ok) { currentUser = {...data.user, password: document.getElementById('loginPassword').value}; localStorage.setItem('bbUser', JSON.stringify(currentUser)); initDashboard(); }
-            else alert("Invalid Login");
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '<span class="spinner"></span>';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mobile: document.getElementById('loginMobile').value.trim(),
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    // Store only a session token — NOT the password
+                    currentUser = data.user;
+                    sessionStorage.setItem('bbUser', JSON.stringify(currentUser));
+                    showToast(`Welcome back, ${currentUser.name}!`);
+                    initDashboard();
+                } else {
+                    showToast(data.error || 'Invalid login credentials', 'error');
+                }
+            } catch (err) {
+                showToast('Server unreachable. Check connection.', 'error');
+            } finally {
+                btn.innerHTML = 'Login';
+                btn.disabled = false;
+            }
         }
 
         async function handleSignup(e) {
             e.preventDefault();
-            const res = await fetch('/api/signup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: document.getElementById('signupName').value, mobile: document.getElementById('signupMobile').value, password: document.getElementById('signupPassword').value})});
-            if(res.ok) { alert("Registered! Please login."); toggleAuth('login'); }
+            const btn = document.getElementById('signupBtn');
+            btn.innerHTML = '<span class="spinner"></span>';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('signupName').value.trim(),
+                        mobile: document.getElementById('signupMobile').value.trim(),
+                        password: document.getElementById('signupPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('Account created! Please login.');
+                    toggleAuth('login');
+                    document.getElementById('signupForm').reset();
+                } else {
+                    showToast(data.error || 'Signup failed', 'error');
+                }
+            } catch (err) {
+                showToast('Server unreachable.', 'error');
+            } finally {
+                btn.innerHTML = 'Create Account';
+                btn.disabled = false;
+            }
         }
 
         function initDashboard() {
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = currentUser.name + " (" + currentUser.role + ")";
+            document.getElementById('userNameDisplay').textContent = `${currentUser.name} · ${currentUser.role.toUpperCase()}`;
+            document.getElementById('sidebarUser').textContent = currentUser.role;
+            // Default to current month
+            const now = new Date();
+            selectedMonth = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+            currentYear = String(now.getFullYear());
+            document.getElementById('yearSelector').value = currentYear;
             loadData();
         }
 
+        // ─── LOAD DATA ───
         async function loadData() {
-            const res = await fetch('/api/records');
-            const allData = await res.json();
+            document.getElementById('entryBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:rgba(255,255,255,0.2); font-size:12px;">Loading...</td></tr>';
+            try {
+                const res = await fetch('/api/records');
+                if (!res.ok) throw new Error('Failed to fetch');
+                const allData = await res.json();
+                renderTable(allData);
+            } catch (err) {
+                document.getElementById('entryBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:#f87171; font-size:12px;">⚠ Could not reach server</td></tr>';
+            }
+        }
+
+        function renderTable(allData) {
             const body = document.getElementById('entryBody');
             body.innerHTML = '';
-            
-            let monthlyTotal = 0;
-            let yearlyTotal = 0;
 
+            let monthlyTotal = 0, yearlyTotal = 0, paidCount = 0;
+
+            // Yearly total: sum all Done records in currentYear
             allData.forEach(r => {
-                if(r.date.includes(currentYear) && r.status === 'Done') yearlyTotal += Number(r.amount);
+                if (r.date && r.date.includes(currentYear) && r.status === 'Done') {
+                    yearlyTotal += Number(r.amount) || 0;
+                }
             });
 
-            members.forEach(m => {
+            const isAdmin = currentUser.role === 'admin';
+
+            members.forEach((m, idx) => {
                 const rec = allData.find(r => r.name === m.name && r.date === selectedMonth);
                 const status = rec ? rec.status : 'Pending';
-                const amt = rec ? rec.amount : 500;
-                if(status === 'Done') monthlyTotal += Number(amt);
+                const amt = rec ? Number(rec.amount) : 500;
 
-                const isAdmin = currentUser.role === 'admin';
+                if (status === 'Done') { monthlyTotal += amt; paidCount++; }
+
+                const statusColor = status === 'Done' ? '#34d399' : '#f97316';
+                const rowDelay = `animation-delay: ${idx * 40}ms`;
+
                 body.innerHTML += `
-                    <tr class="hover:bg-white/[0.02]">
-                        <td class="px-10 py-5 font-bold text-sm">${m.name}</td>
-                        <td class="px-10 py-5 text-center">
-                            <input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin ? 'disabled' : ''} class="bg-transparent text-blue-400 font-black w-20 text-center outline-none ${!isAdmin ? 'opacity-40' : ''}">
-                        </td>
-                        <td class="px-10 py-5 text-center">
-                            <select id="status-${m.id}" ${!isAdmin ? 'disabled' : ''} class="bg-transparent text-[10px] font-black uppercase ${status === 'Done' ? 'text-green-400' : 'text-orange-500'} outline-none">
-                                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>PENDING</option>
-                                <option value="Done" ${status === 'Done' ? 'selected' : ''}>DONE</option>
-                            </select>
-                        </td>
-                        <td class="px-10 py-5 text-right">
-                            ${isAdmin ? `<button onclick="saveEntry('${m.name}', '${m.id}')" class="bg-white text-black px-5 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">Save</button>` : '<span class="text-[8px] text-white/10 uppercase italic">Protected</span>'}
-                        </td>
-                    </tr>`;
+                <tr style="${rowDelay}; opacity:0;">
+                    <td style="font-size:10px; color:rgba(255,255,255,0.2); font-weight:700; font-family:'DM Sans',sans-serif;">${m.id}</td>
+                    <td style="font-weight:600; font-size:14px;">${m.name}</td>
+                    <td style="text-align:center;">
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                            <span style="color:rgba(255,255,255,0.3); font-size:12px;">₹</span>
+                            <input type="number" id="amt-${m.id}" value="${amt}" min="0"
+                                ${!isAdmin ? 'disabled' : ''}
+                                class="amount-input"
+                                onchange="this.style.color='#facc15'">
+                        </span>
+                    </td>
+                    <td style="text-align:center;">
+                        <select id="status-${m.id}" ${!isAdmin ? 'disabled' : ''}
+                            class="status-select"
+                            style="color:${statusColor}"
+                            onchange="this.style.color = this.value === 'Done' ? '#34d399' : '#f97316'">
+                            <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>PENDING</option>
+                            <option value="Done" ${status === 'Done' ? 'selected' : ''}>DONE</option>
+                        </select>
+                    </td>
+                    <td style="text-align:right;">
+                        ${isAdmin
+                            ? `<button onclick="saveEntry('${m.name}', '${m.id}')" class="save-btn">Save</button>`
+                            : `<span style="font-size:8px; color:rgba(255,255,255,0.1); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif;">PROTECTED</span>`
+                        }
+                    </td>
+                </tr>`;
             });
-            document.getElementById('totalBadge').innerText = `₹${monthlyTotal}`;
-            document.getElementById('yearlyTotalBadge').innerText = `₹${yearlyTotal}`;
+
+            // Trigger row animations
+            setTimeout(() => {
+                document.querySelectorAll('#entryBody tr').forEach((tr, i) => {
+                    setTimeout(() => { tr.style.opacity = '1'; }, i * 40);
+                });
+            }, 10);
+
+            document.getElementById('totalBadge').textContent = `₹${monthlyTotal.toLocaleString('en-IN')}`;
+            document.getElementById('yearlyTotalBadge').textContent = `₹${yearlyTotal.toLocaleString('en-IN')}`;
+            document.getElementById('paidCountBadge').textContent = `${paidCount}/${members.length}`;
             renderMonths();
         }
 
+        // ─── SAVE ENTRY ───
         async function saveEntry(name, id) {
-            const body = { name, amount: document.getElementById(`amt-${id}`).value, status: document.getElementById(`status-${id}`).value, date: selectedMonth, mobile: currentUser.mobile, password: currentUser.password };
-            const res = await fetch('/api/records', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-            if(res.ok) loadData();
+            const btn = event.target;
+            btn.textContent = '...';
+            btn.disabled = true;
+
+            const amount = document.getElementById(`amt-${id}`).value;
+            const status = document.getElementById(`status-${id}`).value;
+
+            try {
+                const res = await fetch('/api/records', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name, amount, status,
+                        date: selectedMonth,
+                        // FIX: Send session token instead of password
+                        mobile: currentUser.mobile,
+                        token: currentUser.token || ''
+                    })
+                });
+                if (res.ok) {
+                    showToast(`${name.split(' ')[0]} updated ✓`);
+                    loadData();
+                } else {
+                    const d = await res.json();
+                    showToast(d.error || 'Save failed', 'error');
+                }
+            } catch (err) {
+                showToast('Server unreachable', 'error');
+            } finally {
+                btn.textContent = 'Save';
+                btn.disabled = false;
+            }
         }
 
-        function changeYear(year) { currentYear = year; let m = selectedMonth.split(' ')[0]; switchMonth(`${m} ${currentYear}`); }
+        // ─── MONTHS ───
         function renderMonths() {
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            document.getElementById('monthList').innerHTML = months.map(m => {
+            document.getElementById('monthList').innerHTML = MONTHS.map(m => {
                 const mName = `${m} ${currentYear}`;
-                return `<button onclick="switchMonth('${mName}')" class="w-full text-left px-5 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${mName === selectedMonth ? 'bg-blue-600 text-white' : 'text-white/20 hover:bg-white/5'}">${mName}</button>`;
+                const isActive = mName === selectedMonth;
+                return `<button onclick="switchMonth('${mName}')" class="month-btn ${isActive ? 'active' : ''}">${m}</button>`;
             }).join('');
         }
-        function switchMonth(m) { selectedMonth = m; document.getElementById('activeMonthTitle').innerText = m; loadData(); }
-        function logout() { localStorage.removeItem('bbUser'); location.reload(); }
 
-        const saved = localStorage.getItem('bbUser');
-        if (saved) { currentUser = JSON.parse(saved); initDashboard(); }
+        function switchMonth(m) {
+            selectedMonth = m;
+            document.getElementById('activeMonthTitle').textContent = m;
+            loadData();
+        }
+
+        function changeYear(year) {
+            currentYear = year;
+            const monthName = selectedMonth.split(' ')[0];
+            switchMonth(`${monthName} ${currentYear}`);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('bbUser');
+            currentUser = null;
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            showToast('Logged out successfully');
+        }
+
+        // ─── AUTO-LOGIN ───
+        const saved = sessionStorage.getItem('bbUser');
+        if (saved) {
+            try {
+                currentUser = JSON.parse(saved);
+                initDashboard();
+            } catch (e) {
+                sessionStorage.removeItem('bbUser');
+            }
+        }
     </script>
 </body>
 </html>
