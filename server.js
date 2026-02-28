@@ -16,7 +16,7 @@ const sessions = new Map();
 
 // ── SCHEMAS ──
 const UserSchema = new mongoose.Schema({ mobile: { type: String, required: true, unique: true }, password: { type: String, required: true }, name: { type: String, required: true }, role: { type: String, enum: ['admin', 'viewer'], default: 'viewer' } }, { timestamps: true });
-const RecordSchema = new mongoose.Schema({ name: String, amount: { type: Number, default: 500 }, date: String, status: { type: String, enum: ['Pending', 'Done'], default: 'Pending' } }, { timestamps: true });
+const RecordSchema = new mongoose.Schema({ name: String, amount: { type: Number, default: 500 }, date: String, status: { type: String, enum: ['Pending', 'Done'], default: 'Pending' }, paidDate: { type: String, default: '' } }, { timestamps: true });
 const ExpenseSchema = new mongoose.Schema({ description: { type: String, required: true }, amount: { type: Number, required: true }, date: { type: String, required: true }, category: { type: String, default: 'Other' } }, { timestamps: true });
 const MemberSchema = new mongoose.Schema({ id: String, name: String, phone: String });
 const SettingsSchema = new mongoose.Schema({ key: { type: String, unique: true }, value: mongoose.Schema.Types.Mixed });
@@ -118,9 +118,18 @@ app.get('/api/records', async (req, res) => {
 
 app.post('/api/records', requireAdmin, async (req, res) => {
     try {
-        const { name, amount, date, status } = req.body;
+        const { name, amount, date, status, paidDate } = req.body;
         if (!name || !date) return res.status(400).json({ error: "Name and date required" });
-        await Record.findOneAndUpdate({ name, date }, { amount: Number(amount) || 500, status: status || 'Pending' }, { upsert: true, returnDocument: 'after' });
+        const finalStatus = status || 'Pending';
+        // Auto-set paidDate to today when marking Done; clear it when marking Pending
+        const finalPaidDate = finalStatus === 'Done'
+            ? (paidDate || new Date().toISOString().split('T')[0])
+            : '';
+        await Record.findOneAndUpdate(
+            { name, date },
+            { amount: Number(amount) || 500, status: finalStatus, paidDate: finalPaidDate },
+            { upsert: true, returnDocument: 'after' }
+        );
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
