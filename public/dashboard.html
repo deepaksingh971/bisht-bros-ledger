@@ -1,99 +1,352 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bisht Brothers | Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bisht Bros | Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --excel-green: #76933c; --excel-blue: #d9e1f2; --excel-paid: #c6efce; }
-        body { background: #f8f9fa; font-family: Arial, sans-serif; }
-        .navbar { background: #333; color: white; margin-bottom: 20px; }
-        .excel-table { width: 100%; border-collapse: collapse; background: white; border: 2px solid #333; }
-        .excel-table th, .excel-table td { border: 1px solid #aaa; padding: 12px; text-align: center; }
-        .head-green { background: var(--excel-green); color: white; font-weight: bold; }
-        .head-blue { background: var(--excel-blue); font-weight: bold; }
-        .paid-green { background: var(--excel-paid); color: #006100; font-weight: bold; }
-        .total-yellow { background: #ffff00; font-weight: bold; }
-        .card { border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        :root {
+            --green: #1e7e34;
+            --paid-bg: #d1fae5;
+            --paid-text: #065f46;
+            --pending-bg: #fff7ed;
+            --pending-text: #c2410c;
+            --header-bg: #1e3a5f;
+            --total-bg: #fef9c3;
+        }
+        body {
+            background: #f0f4f8;
+            font-family: 'DM Sans', Arial, sans-serif;
+        }
+        .navbar {
+            background: var(--header-bg);
+        }
+        .logo { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; font-size: 1.5rem; }
+
+        /* ── Form Card ── */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            padding: 28px;
+        }
+        .form-card h5 { font-weight: 700; color: #374151; }
+
+        /* ── Excel-style Table ── */
+        .excel-wrap { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); overflow: hidden; }
+        .excel-table { width: 100%; border-collapse: collapse; margin: 0; }
+        .excel-table th, .excel-table td {
+            border: 1px solid #d1d5db;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .excel-table td:first-child, .excel-table th:first-child { text-align: left; }
+        .th-header { background: var(--header-bg); color: white; font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+        .th-sub    { background: #dbeafe; font-weight: 600; font-size: 11px; color: #1e3a5f; }
+        .paid-cell { background: var(--paid-bg); color: var(--paid-text); font-weight: 700; }
+        .pending-cell { color: #9ca3af; }
+        .total-row td { background: var(--total-bg); font-weight: 700; border-top: 2px solid #f59e0b; }
+        .month-label { background: #f1f5f9; font-weight: 700; font-size: 12px; color: #374151; min-width: 110px; }
+
+        /* ── Badge ── */
+        .badge-pill {
+            display: inline-block; padding: 4px 10px;
+            border-radius: 20px; font-size: 11px; font-weight: 700;
+        }
+        .badge-paid    { background: var(--paid-bg); color: var(--paid-text); }
+        .badge-pending { background: var(--pending-bg); color: var(--pending-text); }
+
+        /* ── Summary cards ── */
+        .summary-card {
+            background: white; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 16px 20px;
+        }
+        .summary-card .label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+        .summary-card .value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #1e3a5f; }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            background: #1e3a5f; color: white;
+            padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.3s ease; pointer-events: none;
+        }
+        #toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
-    <script>if(!localStorage.getItem('auth_bisht')) window.location.href='/';</script>
+    <!-- FIX: Auth check now uses same key as index.html (sessionStorage 'bbUser') -->
+    <script>
+        const _u = sessionStorage.getItem('bbUser');
+        if (!_u) { window.location.href = '/'; }
+        const _user = JSON.parse(_u || '{}');
+        if (_user.role !== 'admin') {
+            alert("Access Denied: Admin only area.");
+            window.location.href = '/';
+        }
+    </script>
 
-    <nav class="navbar px-4 py-2">
-        <span class="h4 m-0">Bisht Brothers Close Friends Dashboard</span>
-        <button onclick="localStorage.clear(); location.reload();" class="btn btn-outline-light btn-sm">Logout</button>
+    <div id="toast"></div>
+
+    <nav class="navbar navbar-dark px-4 py-2 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <span class="logo text-white">BISHT <span style="color:#60a5fa">BROS</span></span>
+            <span class="badge bg-primary" style="font-size:10px;" id="adminBadge">Admin</span>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="text-white-50" style="font-size:12px;" id="navUsername"></span>
+            <button onclick="handleLogout()" class="btn btn-outline-light btn-sm">Logout</button>
+        </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="card p-4 mb-4">
-            <h5 class="mb-3 text-muted">Add New Record</h5>
-            <div class="row g-3">
+    <div class="container-fluid py-4 px-4">
+        <!-- Summary Row -->
+        <div class="row g-3 mb-4" id="summaryCards"></div>
+
+        <!-- Add Record Form -->
+        <div class="form-card mb-4">
+            <h5 class="mb-3">📝 Update Record</h5>
+            <div class="row g-3 align-items-end">
                 <div class="col-md-3">
+                    <label class="form-label fw-bold" style="font-size:12px;">Member</label>
                     <select id="mName" class="form-select">
-                        <option>Deepak Singh Bisht</option><option>Lokesh Singh Bisht</option>
-                        <option>Suraj Singh Bisht</option><option>Karan Singh Bisht</option>
-                        <option>Himanshu Bisht</option><option>Gaurav Bisht</option>
+                        <option>Deepak Singh Bisht</option>
+                        <option>Lokesh Singh Bisht</option>
+                        <option>Suraj Singh Bisht</option>
+                        <option>Karan Singh Bisht</option>
+                        <option>Himanshu Bisht</option>
+                        <option>Gaurav Bisht</option>
+                        <option>Rahul Bisht</option>
+                        <option>Saurav Bisht</option>
+                        <option>Pankaj Bisht</option>
                     </select>
                 </div>
-                <div class="col-md-2"><input type="number" id="mAmt" class="form-control" placeholder="Amount (₹)"></div>
-                <div class="col-md-3"><input type="month" id="mMonth" class="form-control"></div>
-                <div class="col-md-2"><button onclick="saveData()" class="btn btn-success w-100 fw-bold">Update Record</button></div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold" style="font-size:12px;">Amount (₹)</label>
+                    <input type="number" id="mAmt" class="form-control" placeholder="e.g. 500" min="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold" style="font-size:12px;">Month</label>
+                    <!-- FIX: Using text input for "March 2026" format to match server's `date` field -->
+                    <select id="mMonth" class="form-select">
+                        <option value="">-- Select Month --</option>
+                        <option value="January 2026">January 2026</option>
+                        <option value="February 2026">February 2026</option>
+                        <option value="March 2026" selected>March 2026</option>
+                        <option value="April 2026">April 2026</option>
+                        <option value="May 2026">May 2026</option>
+                        <option value="June 2026">June 2026</option>
+                        <option value="July 2026">July 2026</option>
+                        <option value="August 2026">August 2026</option>
+                        <option value="September 2026">September 2026</option>
+                        <option value="October 2026">October 2026</option>
+                        <option value="November 2026">November 2026</option>
+                        <option value="December 2026">December 2026</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold" style="font-size:12px;">Status</label>
+                    <select id="mStatus" class="form-select">
+                        <option value="Done">✅ Done</option>
+                        <option value="Pending">⏳ Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button onclick="saveData()" class="btn btn-primary w-100 fw-bold" id="saveBtn">Update Record</button>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive bg-white p-2">
-            <table class="excel-table">
-                <thead>
-                    <tr class="head-green">
-                        <th>Month / Name</th>
-                        <th>Deepak</th><th>Lokesh</th><th>Suraj</th><th>Karan</th><th>Himanshu</th><th>Gaurav</th>
-                        <th class="total-yellow">Monthly Total</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+        <!-- Table -->
+        <div class="excel-wrap">
+            <div class="table-responsive">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th class="th-header">Month</th>
+                            <th class="th-header">Deepak</th>
+                            <th class="th-header">Lokesh</th>
+                            <th class="th-header">Suraj</th>
+                            <th class="th-header">Karan</th>
+                            <th class="th-header">Himanshu</th>
+                            <th class="th-header">Gaurav</th>
+                            <th class="th-header">Rahul</th>
+                            <th class="th-header">Saurav</th>
+                            <th class="th-header">Pankaj</th>
+                            <th class="th-header" style="background:#92400e;">Monthly Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="11" style="text-align:center; padding:40px; color:#9ca3af;">Loading data...</td></tr>
+                    </tbody>
+                    <tfoot id="tableFoot"></tfoot>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        const members = ["Deepak Singh Bisht", "Lokesh Singh Bisht", "Suraj Singh Bisht", "Karan Singh Bisht", "Himanshu Bisht", "Gaurav Bisht"];
-        const months = ["2026-03", "2026-02", "2026-01"];
+        const members = [
+            "Deepak Singh Bisht","Lokesh Singh Bisht","Suraj Singh Bisht",
+            "Karan Singh Bisht","Himanshu Bisht","Gaurav Bisht",
+            "Rahul Bisht","Saurav Bisht","Pankaj Bisht"
+        ];
+
+        const MONTHS_2026 = [
+            "January 2026","February 2026","March 2026","April 2026",
+            "May 2026","June 2026","July 2026","August 2026",
+            "September 2026","October 2026","November 2026","December 2026"
+        ];
+
+        const currentUser = JSON.parse(sessionStorage.getItem('bbUser') || '{}');
+
+        // Set navbar info
+        document.getElementById('navUsername').textContent = currentUser.name || '';
+
+        function showToast(msg, color = '#1e3a5f') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = color;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
 
         async function fetchGrid() {
-            const res = await fetch('/api/records');
-            const data = await res.json();
+            try {
+                const res = await fetch('/api/records');
+                if (!res.ok) throw new Error('Failed');
+                const data = await res.json();
+                renderGrid(data);
+            } catch(e) {
+                document.getElementById('tableBody').innerHTML =
+                    '<tr><td colspan="11" style="text-align:center;padding:40px;color:#ef4444;">⚠ Server unreachable</td></tr>';
+            }
+        }
+
+        function renderGrid(data) {
             const body = document.getElementById('tableBody');
+            const foot = document.getElementById('tableFoot');
             body.innerHTML = '';
 
-            months.forEach(m => {
+            let grandTotal = 0;
+            const memberTotals = new Array(members.length).fill(0);
+            let totalPaid = 0, totalExpected = 0;
+
+            MONTHS_2026.forEach(monthStr => {
                 let rowSum = 0;
-                let html = `<tr><td class="head-blue">${m}</td>`;
-                members.forEach(mem => {
-                    const match = data.find(d => d.name === mem && d.month === m);
-                    if(match) {
-                        html += `<td class="paid-green">₹${match.amount}</td>`;
-                        rowSum += match.amount;
-                    } else { html += `<td>-</td>`; }
+                let html = `<tr><td class="month-label">${monthStr}</td>`;
+
+                members.forEach((mem, idx) => {
+                    // FIX: using `date` field (not `month`) to match server schema
+                    const match = data.find(d => d.name === mem && d.date === monthStr);
+                    if (match && match.status === 'Done') {
+                        const amt = Number(match.amount) || 0;
+                        html += `<td class="paid-cell">₹${amt.toLocaleString('en-IN')}<br><span class="badge-pill badge-paid">Paid</span></td>`;
+                        rowSum += amt;
+                        memberTotals[idx] += amt;
+                        totalPaid++;
+                    } else if (match && match.status === 'Pending') {
+                        html += `<td class="pending-cell"><span class="badge-pill badge-pending">Pending</span></td>`;
+                        totalExpected++;
+                    } else {
+                        html += `<td class="pending-cell">—</td>`;
+                    }
                 });
-                html += `<td class="total-yellow">₹${rowSum}</td></tr>`;
+
+                grandTotal += rowSum;
+                html += `<td style="background:#fef9c3; font-weight:700; color:#92400e;">₹${rowSum.toLocaleString('en-IN')}</td></tr>`;
                 body.innerHTML += html;
             });
+
+            // Member totals footer
+            let footHtml = `<tr class="total-row"><td class="month-label" style="background:#fef9c3;">YEAR TOTAL</td>`;
+            memberTotals.forEach(t => { footHtml += `<td>₹${t.toLocaleString('en-IN')}</td>`; });
+            footHtml += `<td style="font-size:15px; color:#92400e;">₹${grandTotal.toLocaleString('en-IN')}</td></tr>`;
+            foot.innerHTML = footHtml;
+
+            // Summary cards
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="col-6 col-md-3">
+                    <div class="summary-card">
+                        <div class="label">Year Total</div>
+                        <div class="value">₹${grandTotal.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="summary-card">
+                        <div class="label">Paid Entries</div>
+                        <div class="value" style="color:#065f46;">${totalPaid}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="summary-card">
+                        <div class="label">Pending Entries</div>
+                        <div class="value" style="color:#c2410c;">${totalExpected}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="summary-card">
+                        <div class="label">Logged In As</div>
+                        <div class="value" style="font-size:18px; padding-top:6px;">${currentUser.name}</div>
+                    </div>
+                </div>`;
         }
 
         async function saveData() {
-            const name = document.getElementById('mName').value;
+            const name   = document.getElementById('mName').value;
             const amount = document.getElementById('mAmt').value;
-            const month = document.getElementById('mMonth').value;
-            if(!amount || !month) return alert("Pura data bharo bhai!");
+            const date   = document.getElementById('mMonth').value;  // "March 2026" format
+            const status = document.getElementById('mStatus').value;
 
-            await fetch('/api/records', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name, amount, month })
-            });
-            document.getElementById('mAmt').value = '';
-            fetchGrid();
+            if (!amount || !date) return showToast('⚠ Pura data bharo bhai!', '#c2410c');
+
+            const btn = document.getElementById('saveBtn');
+            btn.textContent = 'Saving...'; btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/records', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name, amount: Number(amount), date, status,
+                        mobile: currentUser.mobile,
+                        token: currentUser.token
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`✅ ${name.split(' ')[0]} ka record update ho gaya!`, '#065f46');
+                    document.getElementById('mAmt').value = '';
+                    fetchGrid();
+                } else {
+                    showToast(`❌ ${data.error}`, '#c2410c');
+                }
+            } catch(e) {
+                showToast('❌ Server se connect nahi ho pa raha', '#c2410c');
+            } finally {
+                btn.textContent = 'Update Record'; btn.disabled = false;
+            }
         }
+
+        async function handleLogout() {
+            // Invalidate server session
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: currentUser.token })
+                });
+            } catch(e) {}
+            sessionStorage.removeItem('bbUser');
+            window.location.href = '/';
+        }
+
         window.onload = fetchGrid;
     </script>
 </body>
