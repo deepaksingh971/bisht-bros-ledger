@@ -121,15 +121,8 @@ app.post('/api/records', requireAdmin, async (req, res) => {
         const { name, amount, date, status, paidDate } = req.body;
         if (!name || !date) return res.status(400).json({ error: "Name and date required" });
         const finalStatus = status || 'Pending';
-        // Auto-set paidDate to today when marking Done; clear it when marking Pending
-        const finalPaidDate = finalStatus === 'Done'
-            ? (paidDate || new Date().toISOString().split('T')[0])
-            : '';
-        await Record.findOneAndUpdate(
-            { name, date },
-            { amount: Number(amount) || 500, status: finalStatus, paidDate: finalPaidDate },
-            { upsert: true, returnDocument: 'after' }
-        );
+        const finalPaidDate = finalStatus === 'Done' ? (paidDate || new Date().toLocaleDateString('en-IN')) : '';
+        await Record.findOneAndUpdate({ name, date }, { amount: Number(amount) || 500, status: finalStatus, paidDate: finalPaidDate }, { upsert: true, returnDocument: 'after' });
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -186,6 +179,23 @@ app.post('/api/members', async (req, res) => {
         await Member.deleteMany({});
         await Member.insertMany(members);
         console.log(`👥 Members updated: ${members.length} members`);
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── CHANGE PASSWORD ──
+app.post('/api/change-password', async (req, res) => {
+    try {
+        const { mobile, token, oldPassword, newPassword } = req.body;
+        if (!token || !sessions.has(token)) return res.status(403).json({ error: "Not authenticated" });
+        const s = sessions.get(token);
+        if (s.mobile !== mobile) return res.status(403).json({ error: "Access denied" });
+        if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: "New password min 6 chars" });
+        const user = await User.findOne({ mobile, password: hashPwd(oldPassword) });
+        if (!user) return res.status(401).json({ error: "Purana password galat hai!" });
+        await User.findOneAndUpdate({ mobile }, { password: hashPwd(newPassword) });
+        sessions.delete(token); // force re-login for security
+        console.log(`🔑 Password changed: ${mobile}`);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
