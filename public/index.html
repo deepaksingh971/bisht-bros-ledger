@@ -3,598 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bisht Bros | Premium Ledger</title>
+    <title>Bisht Bros | Digital Ledger</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #3b82f6;
-            --accent-glow: rgba(59,130,246,0.3);
+            --accent2: #06b6d4;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --bg: #060a12;
+            --card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.07);
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: #080c14;
-            color: white;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Syne', sans-serif; background: var(--bg); color: white; height: 100vh; overflow: hidden; }
 
-        /* Animated gradient background */
-        .bg-mesh {
-            position: fixed; inset: 0; z-index: 0;
+        .logo { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+        /* BG */
+        .bg-fx {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,130,246,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 90%, rgba(99,102,241,0.1) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(14,165,233,0.05) 0%, transparent 70%);
-            animation: meshShift 12s ease-in-out infinite alternate;
+                radial-gradient(ellipse 70% 50% at 15% 15%, rgba(59,130,246,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 70% at 85% 85%, rgba(6,182,212,0.07) 0%, transparent 60%);
         }
-        @keyframes meshShift {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.7; transform: scale(1.05); }
-        }
-
-        /* Grid overlay */
         .bg-grid {
-            position: fixed; inset: 0; z-index: 0;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 60px 60px;
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
-        .glass {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.07);
-        }
-        .glass-strong {
-            background: rgba(8,12,20,0.85);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* Auth Card */
+        /* AUTH */
+        .auth-wrap { position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
         .auth-card {
-            background: rgba(10,15,28,0.95);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(59,130,246,0.15);
-            box-shadow: 0 0 80px rgba(59,130,246,0.08), 0 40px 80px rgba(0,0,0,0.5);
+            background: rgba(6,10,18,0.95); border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 28px; padding: 48px 40px; width: 100%; max-width: 400px;
+            box-shadow: 0 0 80px rgba(59,130,246,0.1), 0 40px 80px rgba(0,0,0,0.6);
         }
-
-        .input-field {
-            width: 100%;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 14px 20px;
-            color: white;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s;
+        .inp {
+            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 14px 18px; color: white; font-family: 'Syne', sans-serif;
+            font-size: 14px; outline: none; transition: all 0.2s; margin-bottom: 12px;
         }
-        .input-field:focus {
-            border-color: var(--accent);
-            background: rgba(59,130,246,0.05);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-        }
-        .input-field::placeholder { color: rgba(255,255,255,0.2); }
+        .inp:focus { border-color: var(--accent); background: rgba(59,130,246,0.06); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .inp::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-blue { width: 100%; background: var(--accent); border: none; border-radius: 14px; padding: 14px; color: white; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(59,130,246,0.3); }
+        .btn-blue:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-blue:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .btn-primary {
-            width: 100%; background: var(--accent);
-            padding: 14px; border-radius: 14px;
-            font-weight: 700; font-size: 14px;
-            border: none; color: white; cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 20px rgba(59,130,246,0.3);
-            font-family: 'DM Sans', sans-serif;
-        }
-        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(59,130,246,0.4); }
-        .btn-primary:active { transform: translateY(0); }
+        /* DASHBOARD LAYOUT */
+        .dash { position: relative; z-index: 10; display: flex; height: 100vh; }
 
-        /* Logo */
-        .logo-text { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-
-        /* Sidebar */
+        /* SIDEBAR */
         .sidebar {
-            width: 260px; flex-shrink: 0;
-            background: rgba(8,12,20,0.95);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column;
-            padding: 32px 20px;
-            height: 100vh;
+            width: 240px; flex-shrink: 0; background: rgba(6,10,18,0.98);
+            border-right: 1px solid var(--border); display: flex; flex-direction: column;
+            padding: 24px 16px; height: 100vh; overflow-y: auto;
         }
-
         .month-btn {
-            width: 100%; text-align: left;
-            padding: 10px 16px; border-radius: 10px;
-            font-size: 11px; font-weight: 600;
-            letter-spacing: 0.08em; text-transform: uppercase;
-            cursor: pointer; border: none;
-            background: transparent; color: rgba(255,255,255,0.3);
-            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+            width: 100%; text-align: left; padding: 9px 14px; border-radius: 10px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+            cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.3);
+            transition: all 0.15s; font-family: 'Syne', sans-serif; margin-bottom: 2px;
         }
-        .month-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
-        .month-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+        .month-btn:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+        .month-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
 
-        /* Table */
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .data-table th {
-            font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
-            text-transform: uppercase; color: rgba(255,255,255,0.2);
-            padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.02);
+        /* MAIN */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        .header {
+            padding: 20px 32px; border-bottom: 1px solid var(--border);
+            background: rgba(6,10,18,0.7); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
         }
-        .data-table td { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .data-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
-        .data-table tbody tr:last-child td { border-bottom: none; }
-
-        .status-done { color: #34d399; }
-        .status-pending { color: #f97316; }
-
-        .amount-input {
-            background: transparent; border: none; outline: none;
-            color: var(--accent); font-weight: 700; font-size: 15px;
-            width: 80px; text-align: center;
-            font-family: 'DM Sans', sans-serif;
+        .stat-pill {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 12px 20px; text-align: right;
         }
-        .amount-input:not([disabled]):focus { 
-            background: rgba(59,130,246,0.08); border-radius: 8px; 
-        }
-        .amount-input[disabled] { opacity: 0.4; cursor: not-allowed; }
+        .stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-transform: uppercase; margin-bottom: 3px; }
+        .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; }
 
-        .status-select {
-            background: transparent; border: none; outline: none;
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            cursor: pointer; font-family: 'DM Sans', sans-serif;
-        }
-        .status-select option { background: #1a1a2e; color: white; }
+        /* TABLE AREA */
+        .table-wrap { flex: 1; overflow-y: auto; padding: 24px 32px; }
+        .glass-table { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.2); padding: 14px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        tbody td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(255,255,255,0.02); cursor: pointer; }
+        tbody tr { transition: all 0.15s; }
 
-        .save-btn {
-            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-            color: white; padding: 7px 18px; border-radius: 8px;
-            font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-            text-transform: uppercase; cursor: pointer;
-            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
-            white-space: nowrap;
-        }
-        .save-btn:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .amt-inp { background: transparent; border: none; outline: none; color: var(--accent); font-weight: 700; font-size: 14px; width: 70px; text-align: center; font-family: 'Syne', sans-serif; }
+        .amt-inp:not([disabled]):focus { background: rgba(59,130,246,0.1); border-radius: 6px; }
+        .amt-inp[disabled] { opacity: 0.4; }
 
-        /* Scrollbar */
+        .status-sel { background: transparent; border: none; outline: none; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Syne', sans-serif; cursor: pointer; }
+        .status-sel option { background: #0a0f1e; }
+
+        .save-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 6px 16px; border-radius: 8px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; font-family: 'Syne', sans-serif; }
+        .save-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+        /* MEMBER DETAIL PANEL */
+        .detail-panel {
+            position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+            background: rgba(6,10,18,0.98); border-left: 1px solid rgba(59,130,246,0.2);
+            z-index: 100; transition: right 0.35s cubic-bezier(0.34,1.2,0.64,1);
+            overflow-y: auto; padding: 32px 28px;
+            box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+        }
+        .detail-panel.open { right: 0; }
+        .detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
+        .detail-overlay.show { display: block; }
+
+        /* EXPENSE MODAL */
+        .modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; display: none; }
+        .modal.show { display: flex; }
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 199; }
+        .modal-card { position: relative; z-index: 200; background: #0a0f1e; border: 1px solid rgba(59,130,246,0.2); border-radius: 24px; padding: 36px; width: 100%; max-width: 480px; }
+
+        /* LEADERBOARD */
+        .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+
+        /* TOAST */
+        #toast { position: fixed; bottom: 28px; right: 28px; z-index: 999; padding: 12px 22px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #0f172a; border: 1px solid var(--border); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.34,1.4,0.64,1); pointer-events: none; }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.s { border-color: rgba(16,185,129,0.4); color: var(--green); }
+        #toast.e { border-color: rgba(239,68,68,0.4); color: var(--red); }
+
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
 
-        /* Stat card */
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px; padding: 16px 22px;
-        }
-
-        /* Toast */
-        #toast {
-            position: fixed; bottom: 32px; right: 32px; z-index: 9999;
-            padding: 14px 24px; border-radius: 12px;
-            font-size: 13px; font-weight: 600;
-            background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
-            transform: translateY(80px); opacity: 0;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        #toast.show { transform: translateY(0); opacity: 1; }
-        #toast.success { border-color: rgba(52,211,153,0.3); color: #34d399; }
-        #toast.error { border-color: rgba(248,113,113,0.3); color: #f87171; }
-
-        /* Page transitions */
-        .page { transition: opacity 0.3s ease; }
-        .page.hidden { opacity: 0; pointer-events: none; display: none !important; }
-
-        /* Spinner */
-        .spinner {
-            width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
-            border-top-color: white; border-radius: 50%;
-            animation: spin 0.6s linear infinite; display: inline-block;
-        }
+        .hidden { display: none !important; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Year select */
-        .year-select {
-            width: 100%; background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px; padding: 10px 14px;
-            color: white; font-size: 12px; font-weight: 600;
-            outline: none; cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .year-select option { background: #080c14; }
+        /* TABS */
+        .tab-btn { padding: 8px 18px; border-radius: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; border: none; font-family: 'Syne', sans-serif; transition: all 0.15s; }
+        .tab-btn.active { background: var(--accent); color: white; }
+        .tab-btn:not(.active) { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
 
-        select { appearance: none; -webkit-appearance: none; }
+        /* PROGRESS BAR */
+        .prog-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+        .prog-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.5s ease; }
 
-        /* Slide-in animation for rows */
-        @keyframes rowIn {
-            from { opacity: 0; transform: translateX(-12px); }
-            to { opacity: 1; transform: translateX(0); }
+        /* WHATSAPP BTN */
+        .wa-btn { display: inline-flex; align-items: center; gap: 8px; background: #25d366; border: none; border-radius: 10px; padding: 8px 16px; color: white; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.15s; }
+        .wa-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+
+        /* YEAR SELECT */
+        .year-sel { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; color: white; font-size: 12px; font-weight: 700; outline: none; font-family: 'Syne', sans-serif; appearance: none; cursor: pointer; }
+        .year-sel option { background: #060a12; }
+
+        @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+        tbody tr { animation: rowIn 0.2s ease both; }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; padding: 16px 10px; }
+            .header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+            .table-wrap { padding: 16px; }
+            .stat-pill { padding: 10px 14px; }
+            .stat-val { font-size: 20px; }
+            .detail-panel { width: 100%; right: -100%; }
         }
-        .data-table tbody tr { animation: rowIn 0.2s ease forwards; }
     </style>
 </head>
 <body>
-    <div class="bg-mesh"></div>
-    <div class="bg-grid"></div>
-    <div id="toast"></div>
+<div class="bg-fx"></div>
+<div class="bg-grid"></div>
+<div id="toast"></div>
 
-    <!-- AUTH SCREEN -->
-    <div id="authScreen" class="page relative z-10 flex items-center justify-center min-h-screen px-4">
-        <div class="auth-card w-full max-w-sm rounded-3xl p-10">
-            <!-- Logo -->
-            <div class="text-center mb-8">
-                <h1 class="logo-text text-5xl mb-1">BISHT <span style="color: var(--accent)">BROS</span></h1>
-                <p style="color: rgba(255,255,255,0.25); font-size: 9px; letter-spacing: 0.45em; font-weight: 700; text-transform: uppercase;">Digital Ledger System</p>
-            </div>
+<!-- DETAIL OVERLAY -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
 
-            <!-- Login Form -->
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
-                <input type="tel" id="loginMobile" class="input-field" placeholder="Mobile Number" required>
-                <input type="password" id="loginPassword" class="input-field" placeholder="Password" required>
-                <button type="submit" class="btn-primary mt-2" id="loginBtn">Login</button>
-                <p style="text-align:center; font-size: 12px; color: rgba(255,255,255,0.25); padding-top: 8px;">
-                    New member? <span onclick="toggleAuth('signup')" style="color: var(--accent); cursor: pointer; font-weight: 700;">Register</span>
-                </p>
-            </form>
+<!-- MEMBER DETAIL PANEL -->
+<div class="detail-panel" id="detailPanel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+        <h3 class="logo" style="font-size:22px;">MEMBER <span style="color:var(--accent)">DETAIL</span></h3>
+        <button onclick="closeDetail()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px;">×</button>
+    </div>
+    <div id="detailContent"></div>
+</div>
 
-            <!-- Signup Form -->
-            <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-3 hidden">
-                <input type="text" id="signupName" class="input-field" placeholder="Full Name" required>
-                <input type="tel" id="signupMobile" class="input-field" placeholder="Mobile Number" required>
-                <input type="password" id="signupPassword" class="input-field" placeholder="Set Password (min 6 chars)" minlength="6" required>
-                <button type="submit" class="btn-primary mt-2" id="signupBtn">Create Account</button>
-                <p style="text-align:center; font-size: 12px; color: rgba(255,255,255,0.25); padding-top: 8px;">
-                    <span onclick="toggleAuth('login')" style="color: var(--accent); cursor: pointer; font-weight: 700;">← Back to Login</span>
-                </p>
-            </form>
+<!-- EXPENSE MODAL -->
+<div class="modal" id="expenseModal">
+    <div class="modal-bg" onclick="closeExpense()"></div>
+    <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h3 class="logo" style="font-size:22px;">ADD <span style="color:var(--accent)">EXPENSE</span></h3>
+            <button onclick="closeExpense()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px;">×</button>
         </div>
+        <input class="inp" id="expDesc" placeholder="Description (e.g. Dinner at hotel)">
+        <input class="inp" id="expAmt" type="number" placeholder="Amount (₹)">
+        <input class="inp" id="expDate" type="text" placeholder="Month (e.g. March 2026)">
+        <select class="inp" id="expCat" style="appearance:none;">
+            <option value="Food">🍕 Food</option>
+            <option value="Travel">🚗 Travel</option>
+            <option value="Entertainment">🎮 Entertainment</option>
+            <option value="Other">📦 Other</option>
+        </select>
+        <button class="btn-blue" onclick="saveExpense()">Save Expense</button>
+    </div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="auth-wrap">
+    <div class="auth-card">
+        <div style="text-align:center; margin-bottom:36px;">
+            <h1 class="logo" style="font-size:52px; line-height:1;">BISHT <span style="color:var(--accent)">BROS</span></h1>
+            <p style="font-size:9px; letter-spacing:0.4em; color:rgba(255,255,255,0.2); font-weight:700; text-transform:uppercase; margin-top:6px;">Digital Ledger System</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <input class="inp" type="tel" id="loginMobile" placeholder="Mobile Number" required>
+            <input class="inp" type="password" id="loginPassword" placeholder="Password" required>
+            <button class="btn-blue" type="submit" id="loginBtn">Login</button>
+            <p style="text-align:center; font-size:12px; color:rgba(255,255,255,0.2); margin-top:16px;">
+                New member? <span onclick="toggleAuth('signup')" style="color:var(--accent); cursor:pointer; font-weight:700;">Register</span>
+            </p>
+        </form>
+
+        <form id="signupForm" onsubmit="handleSignup(event)" class="hidden">
+            <input class="inp" type="text" id="signupName" placeholder="Full Name" required>
+            <input class="inp" type="tel" id="signupMobile" placeholder="Mobile Number" required>
+            <input class="inp" type="password" id="signupPassword" placeholder="Password (min 6 chars)" minlength="6" required>
+            <button class="btn-blue" type="submit" id="signupBtn">Create Account</button>
+            <p style="text-align:center; font-size:12px; color:rgba(255,255,255,0.2); margin-top:16px;">
+                <span onclick="toggleAuth('login')" style="color:var(--accent); cursor:pointer; font-weight:700;">← Back to Login</span>
+            </p>
+        </form>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashScreen" class="dash hidden">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div style="margin-bottom:24px;">
+            <div class="logo" style="font-size:26px;">BISHT <span style="color:var(--accent)">BROS</span></div>
+            <div id="sideRole" style="font-size:9px; color:rgba(255,255,255,0.25); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:3px;"></div>
+        </div>
+
+        <!-- TABS -->
+        <div style="display:flex; gap:6px; margin-bottom:20px;">
+            <button class="tab-btn active" id="tabLedger" onclick="switchTab('ledger')">Ledger</button>
+            <button class="tab-btn" id="tabStats" onclick="switchTab('stats')">Stats</button>
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <label style="font-size:9px; color:rgba(255,255,255,0.2); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; display:block; margin-bottom:8px;">Year</label>
+            <select class="year-sel" id="yearSel" onchange="changeYear(this.value)">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+            </select>
+        </div>
+
+        <div style="flex:1; overflow-y:auto;" id="monthList"></div>
+
+        <!-- Admin actions -->
+        <div id="adminActions" class="hidden" style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+            <button onclick="openExpense()" style="width:100%; padding:9px; border-radius:10px; background:rgba(6,182,212,0.1); color:#06b6d4; font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(6,182,212,0.2); cursor:pointer; font-family:'Syne',sans-serif;">+ Add Expense</button>
+            <button onclick="exportPDF()" style="width:100%; padding:9px; border-radius:10px; background:rgba(16,185,129,0.1); color:#10b981; font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(16,185,129,0.2); cursor:pointer; font-family:'Syne',sans-serif;">⬇ Export PDF</button>
+        </div>
+
+        <button onclick="logout()" style="width:100%; margin-top:12px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.08); color:rgba(239,68,68,0.7); font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; border:1px solid rgba(239,68,68,0.15); cursor:pointer; font-family:'Syne',sans-serif; transition:all 0.15s;"
+            onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">
+            Logout
+        </button>
     </div>
 
-    <!-- DASHBOARD SCREEN -->
-    <div id="dashboardScreen" class="page hidden relative z-10 flex h-screen overflow-hidden">
-        
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <div class="mb-8">
-                <h2 class="logo-text text-3xl">BISHT <span style="color:var(--accent)">BROS</span></h2>
-                <p id="sidebarUser" style="font-size:10px; color: rgba(255,255,255,0.3); font-weight:600; letter-spacing:0.1em; margin-top:4px; text-transform:uppercase;"></p>
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <div class="logo" id="activeTitle" style="font-size:36px; line-height:1;">—</div>
+                <div id="userDisplay" style="font-size:10px; color:var(--accent); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:3px;"></div>
             </div>
-
-            <div class="mb-5">
-                <label style="font-size:9px; font-weight:700; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; display:block; margin-bottom:8px;">Select Year</label>
-                <select id="yearSelector" class="year-select" onchange="changeYear(this.value)">
-                    <option value="2026">2026</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                </select>
+            <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+                <div class="stat-pill">
+                    <div class="stat-label">Year Total</div>
+                    <div class="stat-val" id="yearTotal" style="color:var(--accent);">₹0</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-label">Month Total</div>
+                    <div class="stat-val" id="monthTotal">₹0</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-label">Paid</div>
+                    <div class="stat-val" id="paidCount" style="color:var(--green);">0/9</div>
+                </div>
+                <div class="stat-pill" id="expensePill" style="display:none;">
+                    <div class="stat-label">Expenses</div>
+                    <div class="stat-val" id="expenseTotal" style="color:var(--orange);">₹0</div>
+                </div>
+                <div class="stat-pill" id="balancePill" style="display:none;">
+                    <div class="stat-label">Balance</div>
+                    <div class="stat-val" id="balanceTotal" style="color:var(--green);">₹0</div>
+                </div>
             </div>
-
-            <div style="flex:1; overflow-y:auto; margin-bottom:16px;" id="monthList" class="space-y-0.5 pr-1"></div>
-
-            <button onclick="logout()" style="width:100%; padding:11px; border-radius:10px; background:rgba(239,68,68,0.08); color: rgba(239,68,68,0.7); font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; border: 1px solid rgba(239,68,68,0.15); cursor:pointer; transition: all 0.2s; font-family:'DM Sans',sans-serif;"
-                onmouseover="this.style.background='rgba(239,68,68,0.15)'; this.style.color='rgb(239,68,68)'"
-                onmouseout="this.style.background='rgba(239,68,68,0.08)'; this.style.color='rgba(239,68,68,0.7)'">
-                Logout
-            </button>
         </div>
 
-        <!-- MAIN AREA -->
-        <main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-            <!-- Header -->
-            <header style="padding: 28px 40px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; background: rgba(8,12,20,0.6); backdrop-filter:blur(20px); flex-shrink:0;">
-                <div>
-                    <h3 id="activeMonthTitle" class="logo-text" style="font-size: 42px; line-height:1; color:white;">—</h3>
-                    <p id="userNameDisplay" style="font-size:10px; font-weight:600; letter-spacing:0.12em; color:var(--accent); text-transform:uppercase; margin-top:4px;"></p>
-                </div>
-                <div style="display:flex; gap:20px; align-items:center;">
-                    <div class="stat-card text-right">
-                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Year Total</p>
-                        <p id="yearlyTotalBadge" class="logo-text" style="font-size:30px; color:var(--accent); line-height:1;">₹0</p>
-                    </div>
-                    <div class="stat-card text-right">
-                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Month Total</p>
-                        <p id="totalBadge" class="logo-text" style="font-size:30px; color:white; line-height:1;">₹0</p>
-                    </div>
-                    <div class="stat-card text-right">
-                        <p style="font-size:9px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:4px;">Paid</p>
-                        <p id="paidCountBadge" class="logo-text" style="font-size:30px; color: #34d399; line-height:1;">0/9</p>
-                    </div>
-                </div>
-            </header>
+        <!-- LEDGER VIEW -->
+        <div id="ledgerView" class="table-wrap">
+            <div class="glass-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">#</th>
+                            <th style="text-align:left;">Member</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entryBody"></tbody>
+                </table>
+            </div>
 
-            <!-- Table -->
-            <div style="flex:1; padding: 32px 40px; overflow-y:auto;">
-                <div class="glass" style="border-radius:24px; overflow:hidden;">
-                    <table class="data-table">
+            <!-- EXPENSE TABLE -->
+            <div id="expenseSection" style="margin-top:20px; display:none;">
+                <div style="font-size:10px; font-weight:700; letter-spacing:0.15em; color:rgba(255,255,255,0.3); text-transform:uppercase; margin-bottom:10px;">📦 Expenses This Month</div>
+                <div class="glass-table">
+                    <table>
                         <thead>
                             <tr>
-                                <th style="text-align:left">#</th>
-                                <th style="text-align:left">Member</th>
-                                <th>Amount (₹)</th>
-                                <th>Status</th>
-                                <th style="text-align:right">Action</th>
+                                <th style="text-align:left;">Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th style="text-align:right;">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="entryBody"></tbody>
+                        <tbody id="expenseBody"></tbody>
                     </table>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- STATS VIEW -->
+        <div id="statsView" class="table-wrap hidden">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+                <!-- Leaderboard -->
+                <div class="glass-table" style="padding:24px;">
+                    <div class="logo" style="font-size:18px; margin-bottom:20px; color:var(--accent);">LEADERBOARD</div>
+                    <div id="leaderboard"></div>
+                </div>
+                <!-- Payment History -->
+                <div class="glass-table" style="padding:24px;">
+                    <div class="logo" style="font-size:18px; margin-bottom:20px; color:var(--accent2);">PAYMENT RATE</div>
+                    <div id="paymentRate"></div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <script>
-        const members = [
-            { id: 'BB-01', name: 'Deepak Singh Bisht' },
-            { id: 'BB-02', name: 'Lokesh Singh Bisht' },
-            { id: 'BB-03', name: 'Suraj Singh Bisht' },
-            { id: 'BB-04', name: 'Karan Singh Bisht' },
-            { id: 'BB-05', name: 'Himanshu Bisht' },
-            { id: 'BB-06', name: 'Gaurav Bisht' },
-            { id: 'BB-07', name: 'Rahul Bisht' },
-            { id: 'BB-08', name: 'Saurav Bisht' },
-            { id: 'BB-09', name: 'Pankaj Bisht' }
-        ];
+<script>
+const MEMBERS = [
+    { id: 'BB-01', name: 'Deepak Singh Bisht', phone: '9084829903' },
+    { id: 'BB-02', name: 'Lokesh Singh Bisht', phone: '' },
+    { id: 'BB-03', name: 'Suraj Singh Bisht', phone: '' },
+    { id: 'BB-04', name: 'Karan Singh Bisht', phone: '' },
+    { id: 'BB-05', name: 'Himanshu Bisht', phone: '' },
+    { id: 'BB-06', name: 'Gaurav Bisht', phone: '' },
+    { id: 'BB-07', name: 'Rahul Bisht', phone: '' },
+    { id: 'BB-08', name: 'Saurav Bisht', phone: '' },
+    { id: 'BB-09', name: 'Pankaj Bisht', phone: '' }
+];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-        const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+let currentUser = null, currentYear = "2026", selectedMonth = "", allData = [], expenses = [];
 
-        let currentYear = "2026";
-        let selectedMonth = "March 2026";
-        let currentUser = null;
+// ── TOAST ──
+function toast(msg, type = 's') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `show ${type}`;
+    setTimeout(() => t.className = '', 3000);
+}
 
-        // ─── TOAST ───
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = `show ${type}`;
-            setTimeout(() => { t.className = ''; }, 3000);
-        }
+// ── AUTH ──
+function toggleAuth(type) {
+    document.getElementById('loginForm').classList.toggle('hidden', type === 'signup');
+    document.getElementById('signupForm').classList.toggle('hidden', type === 'login');
+}
 
-        // ─── AUTH ───
-        function toggleAuth(type) {
-            document.getElementById('loginForm').classList.toggle('hidden', type === 'signup');
-            document.getElementById('signupForm').classList.toggle('hidden', type === 'login');
-        }
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+    try {
+        const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ mobile: document.getElementById('loginMobile').value.trim(), password: document.getElementById('loginPassword').value }) });
+        const data = await res.json();
+        if (res.ok) {
+            currentUser = data.user;
+            sessionStorage.setItem('bbUser', JSON.stringify(currentUser));
+            initDash();
+        } else { toast(data.error || 'Login failed', 'e'); }
+    } catch { toast('Server unreachable', 'e'); }
+    finally { btn.innerHTML = 'Login'; btn.disabled = false; }
+}
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            btn.innerHTML = '<span class="spinner"></span>';
-            btn.disabled = true;
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mobile: document.getElementById('loginMobile').value.trim(),
-                        password: document.getElementById('loginPassword').value
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    // Store only a session token — NOT the password
-                    currentUser = data.user;
-                    sessionStorage.setItem('bbUser', JSON.stringify(currentUser));
-                    showToast(`Welcome back, ${currentUser.name}!`);
-                    initDashboard();
-                } else {
-                    showToast(data.error || 'Invalid login credentials', 'error');
-                }
-            } catch (err) {
-                showToast('Server unreachable. Check connection.', 'error');
-            } finally {
-                btn.innerHTML = 'Login';
-                btn.disabled = false;
-            }
-        }
+async function handleSignup(e) {
+    e.preventDefault();
+    const btn = document.getElementById('signupBtn');
+    btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+    try {
+        const res = await fetch('/api/signup', { method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ name: document.getElementById('signupName').value.trim(), mobile: document.getElementById('signupMobile').value.trim(), password: document.getElementById('signupPassword').value }) });
+        const data = await res.json();
+        if (res.ok) { toast('Account created! Login karo 🎉'); toggleAuth('login'); document.getElementById('signupForm').reset(); }
+        else { toast(data.error || 'Signup failed', 'e'); }
+    } catch { toast('Server unreachable', 'e'); }
+    finally { btn.innerHTML = 'Create Account'; btn.disabled = false; }
+}
 
-        async function handleSignup(e) {
-            e.preventDefault();
-            const btn = document.getElementById('signupBtn');
-            btn.innerHTML = '<span class="spinner"></span>';
-            btn.disabled = true;
-            try {
-                const res = await fetch('/api/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: document.getElementById('signupName').value.trim(),
-                        mobile: document.getElementById('signupMobile').value.trim(),
-                        password: document.getElementById('signupPassword').value
-                    })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showToast('Account created! Please login.');
-                    toggleAuth('login');
-                    document.getElementById('signupForm').reset();
-                } else {
-                    showToast(data.error || 'Signup failed', 'error');
-                }
-            } catch (err) {
-                showToast('Server unreachable.', 'error');
-            } finally {
-                btn.innerHTML = 'Create Account';
-                btn.disabled = false;
-            }
-        }
+// ── INIT ──
+function initDash() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('dashScreen').classList.remove('hidden');
+    document.getElementById('userDisplay').textContent = `${currentUser.name} · ${currentUser.role.toUpperCase()}`;
+    document.getElementById('sideRole').textContent = currentUser.role;
+    if (currentUser.role === 'admin') {
+        document.getElementById('adminActions').classList.remove('hidden');
+        document.getElementById('adminActions').style.display = 'flex';
+        document.getElementById('expensePill').style.display = 'block';
+        document.getElementById('balancePill').style.display = 'block';
+    }
+    const now = new Date();
+    currentYear = String(now.getFullYear());
+    document.getElementById('yearSel').value = currentYear;
+    selectedMonth = `${MONTHS[now.getMonth()]} ${currentYear}`;
+    document.getElementById('activeTitle').textContent = selectedMonth;
+    loadData();
+}
 
-        function initDashboard() {
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('dashboardScreen').classList.remove('hidden');
-            document.getElementById('userNameDisplay').textContent = `${currentUser.name} · ${currentUser.role.toUpperCase()}`;
-            document.getElementById('sidebarUser').textContent = currentUser.role;
-            // Default to current month
-            const now = new Date();
-            selectedMonth = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
-            currentYear = String(now.getFullYear());
-            document.getElementById('yearSelector').value = currentYear;
-            loadData();
-        }
+// ── LOAD ──
+async function loadData() {
+    try {
+        const [recRes, expRes] = await Promise.all([fetch('/api/records'), fetch('/api/expenses')]);
+        allData = recRes.ok ? await recRes.json() : [];
+        expenses = expRes.ok ? await expRes.json() : [];
+        renderLedger();
+        renderStats();
+    } catch { toast('Server unreachable', 'e'); }
+}
 
-        // ─── LOAD DATA ───
-        async function loadData() {
-            document.getElementById('entryBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:rgba(255,255,255,0.2); font-size:12px;">Loading...</td></tr>';
-            try {
-                const res = await fetch('/api/records');
-                if (!res.ok) throw new Error('Failed to fetch');
-                const allData = await res.json();
-                renderTable(allData);
-            } catch (err) {
-                document.getElementById('entryBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:#f87171; font-size:12px;">⚠ Could not reach server</td></tr>';
-            }
-        }
+// ── RENDER LEDGER ──
+function renderLedger() {
+    const body = document.getElementById('entryBody');
+    body.innerHTML = '';
+    let monthTotal = 0, yearTotal = 0, paid = 0;
+    const isAdmin = currentUser.role === 'admin';
 
-        function renderTable(allData) {
-            const body = document.getElementById('entryBody');
-            body.innerHTML = '';
+    allData.forEach(r => { if (r.date && r.date.includes(currentYear) && r.status === 'Done') yearTotal += Number(r.amount) || 0; });
 
-            let monthlyTotal = 0, yearlyTotal = 0, paidCount = 0;
+    MEMBERS.forEach((m, i) => {
+        const rec = allData.find(r => r.name === m.name && r.date === selectedMonth);
+        const status = rec ? rec.status : 'Pending';
+        const amt = rec ? Number(rec.amount) : 500;
+        if (status === 'Done') { monthTotal += amt; paid++; }
+        const sc = status === 'Done' ? 'var(--green)' : 'var(--orange)';
 
-            // Yearly total: sum all Done records in currentYear
-            allData.forEach(r => {
-                if (r.date && r.date.includes(currentYear) && r.status === 'Done') {
-                    yearlyTotal += Number(r.amount) || 0;
-                }
-            });
+        body.innerHTML += `<tr onclick="openDetail('${m.name}')" style="animation-delay:${i*30}ms">
+            <td style="color:rgba(255,255,255,0.2); font-size:10px; font-weight:700;">${m.id}</td>
+            <td style="font-weight:700;">${m.name}</td>
+            <td style="text-align:center;">
+                <span style="color:rgba(255,255,255,0.3); font-size:12px;">₹</span>
+                <input type="number" id="amt-${m.id}" value="${amt}" ${!isAdmin?'disabled':''} class="amt-inp" onclick="event.stopPropagation()">
+            </td>
+            <td style="text-align:center;">
+                <select id="st-${m.id}" ${!isAdmin?'disabled':''} class="status-sel" style="color:${sc}"
+                    onchange="this.style.color=this.value==='Done'?'var(--green)':'var(--orange)'; event.stopPropagation()">
+                    <option value="Pending" ${status==='Pending'?'selected':''}>PENDING</option>
+                    <option value="Done" ${status==='Done'?'selected':''}>DONE</option>
+                </select>
+            </td>
+            <td style="text-align:right;" onclick="event.stopPropagation()">
+                ${isAdmin ? `<button class="save-btn" onclick="saveEntry('${m.name}','${m.id}',this)">Save</button>` : '<span style="font-size:8px;color:rgba(255,255,255,0.1);font-weight:700;text-transform:uppercase;">PROTECTED</span>'}
+            </td>
+        </tr>`;
+    });
 
-            const isAdmin = currentUser.role === 'admin';
+    document.getElementById('monthTotal').textContent = `₹${monthTotal.toLocaleString('en-IN')}`;
+    document.getElementById('yearTotal').textContent = `₹${yearTotal.toLocaleString('en-IN')}`;
+    document.getElementById('paidCount').textContent = `${paid}/${MEMBERS.length}`;
 
-            members.forEach((m, idx) => {
-                const rec = allData.find(r => r.name === m.name && r.date === selectedMonth);
-                const status = rec ? rec.status : 'Pending';
-                const amt = rec ? Number(rec.amount) : 500;
+    // Expenses for this month
+    const monthExp = expenses.filter(e => e.date === selectedMonth);
+    const expTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
+    document.getElementById('expenseTotal').textContent = `₹${expTotal.toLocaleString('en-IN')}`;
+    document.getElementById('balanceTotal').textContent = `₹${(monthTotal - expTotal).toLocaleString('en-IN')}`;
 
-                if (status === 'Done') { monthlyTotal += amt; paidCount++; }
+    // Expense table
+    if (monthExp.length > 0 && isAdmin) {
+        document.getElementById('expenseSection').style.display = 'block';
+        const eb = document.getElementById('expenseBody');
+        eb.innerHTML = monthExp.map(e => `<tr>
+            <td style="font-weight:600;">${e.description}</td>
+            <td style="text-align:center; font-size:11px; color:rgba(255,255,255,0.5);">${e.category}</td>
+            <td style="text-align:center; color:var(--orange); font-weight:700;">₹${Number(e.amount).toLocaleString('en-IN')}</td>
+            <td style="text-align:right;"><button class="save-btn" onclick="deleteExpense('${e._id}')" style="color:var(--red);">Delete</button></td>
+        </tr>`).join('');
+    } else { document.getElementById('expenseSection').style.display = 'none'; }
 
-                const statusColor = status === 'Done' ? '#34d399' : '#f97316';
-                const rowDelay = `animation-delay: ${idx * 40}ms`;
+    renderMonths();
+}
 
-                body.innerHTML += `
-                <tr style="${rowDelay}; opacity:0;">
-                    <td style="font-size:10px; color:rgba(255,255,255,0.2); font-weight:700; font-family:'DM Sans',sans-serif;">${m.id}</td>
-                    <td style="font-weight:600; font-size:14px;">${m.name}</td>
-                    <td style="text-align:center;">
-                        <span style="display:inline-flex; align-items:center; gap:4px;">
-                            <span style="color:rgba(255,255,255,0.3); font-size:12px;">₹</span>
-                            <input type="number" id="amt-${m.id}" value="${amt}" min="0"
-                                ${!isAdmin ? 'disabled' : ''}
-                                class="amount-input"
-                                onchange="this.style.color='#facc15'">
-                        </span>
-                    </td>
-                    <td style="text-align:center;">
-                        <select id="status-${m.id}" ${!isAdmin ? 'disabled' : ''}
-                            class="status-select"
-                            style="color:${statusColor}"
-                            onchange="this.style.color = this.value === 'Done' ? '#34d399' : '#f97316'">
-                            <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>PENDING</option>
-                            <option value="Done" ${status === 'Done' ? 'selected' : ''}>DONE</option>
-                        </select>
-                    </td>
-                    <td style="text-align:right;">
-                        ${isAdmin
-                            ? `<button onclick="saveEntry('${m.name}', '${m.id}')" class="save-btn">Save</button>`
-                            : `<span style="font-size:8px; color:rgba(255,255,255,0.1); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif;">PROTECTED</span>`
-                        }
-                    </td>
-                </tr>`;
-            });
+// ── MEMBER DETAIL PANEL ──
+function openDetail(name) {
+    const m = MEMBERS.find(x => x.name === name);
+    const memberRecs = allData.filter(r => r.name === name);
+    const totalPaid = memberRecs.filter(r => r.status === 'Done').reduce((s, r) => s + Number(r.amount), 0);
+    const paidMonths = memberRecs.filter(r => r.status === 'Done').length;
+    const pendingMonths = memberRecs.filter(r => r.status === 'Pending').length;
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+    const rate = memberRecs.length > 0 ? Math.round((paidMonths / memberRecs.length) * 100) : 0;
 
-            // Trigger row animations
-            setTimeout(() => {
-                document.querySelectorAll('#entryBody tr').forEach((tr, i) => {
-                    setTimeout(() => { tr.style.opacity = '1'; }, i * 40);
-                });
-            }, 10);
+    // WhatsApp message
+    const waMsg = encodeURIComponent(`Hey ${name.split(' ')[0]} bhai! 👋\n${selectedMonth} ka ₹500 pending hai. Please jaldi kar de yaar! 🙏\n- Bisht Bros`);
+    const waLink = m.phone ? `https://wa.me/91${m.phone}?text=${waMsg}` : `https://wa.me/?text=${waMsg}`;
 
-            document.getElementById('totalBadge').textContent = `₹${monthlyTotal.toLocaleString('en-IN')}`;
-            document.getElementById('yearlyTotalBadge').textContent = `₹${yearlyTotal.toLocaleString('en-IN')}`;
-            document.getElementById('paidCountBadge').textContent = `${paidCount}/${members.length}`;
-            renderMonths();
-        }
+    document.getElementById('detailContent').innerHTML = `
+        <div style="text-align:center; margin-bottom:28px;">
+            <div style="width:72px; height:72px; border-radius:20px; background:linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; margin:0 auto 14px; box-shadow:0 8px 24px rgba(59,130,246,0.3);">${initials}</div>
+            <div style="font-weight:800; font-size:18px; margin-bottom:4px;">${name}</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:0.1em;">${m.id}</div>
+        </div>
 
-        // ─── SAVE ENTRY ───
-        async function saveEntry(name, id) {
-            const btn = event.target;
-            btn.textContent = '...';
-            btn.disabled = true;
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+            <div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.15); border-radius:14px; padding:16px; text-align:center;">
+                <div style="font-size:9px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Total Paid</div>
+                <div class="logo" style="font-size:24px; color:var(--accent);">₹${totalPaid.toLocaleString('en-IN')}</div>
+            </div>
+            <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.15); border-radius:14px; padding:16px; text-align:center;">
+                <div style="font-size:9px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">On Time</div>
+                <div class="logo" style="font-size:24px; color:var(--green);">${rate}%</div>
+            </div>
+        </div>
 
-            const amount = document.getElementById(`amt-${id}`).value;
-            const status = document.getElementById(`status-${id}`).value;
+        <div style="margin-bottom:20px;">
+            <div style="font-size:10px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px;">Payment Rate</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${rate}%"></div></div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:rgba(255,255,255,0.4);">
+                <span>✅ ${paidMonths} paid</span>
+                <span>⏳ ${pendingMonths} pending</span>
+            </div>
+        </div>
 
-            try {
-                const res = await fetch('/api/records', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name, amount, status,
-                        date: selectedMonth,
-                        // FIX: Send session token instead of password
-                        mobile: currentUser.mobile,
-                        token: currentUser.token || ''
-                    })
-                });
-                if (res.ok) {
-                    showToast(`${name.split(' ')[0]} updated ✓`);
-                    loadData();
-                } else {
-                    const d = await res.json();
-                    showToast(d.error || 'Save failed', 'error');
-                }
-            } catch (err) {
-                showToast('Server unreachable', 'error');
-            } finally {
-                btn.textContent = 'Save';
-                btn.disabled = false;
-            }
-        }
+        <div style="margin-bottom:20px;">
+            <div style="font-size:10px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">Payment History</div>
+            <div style="max-height:220px; overflow-y:auto;">
+                ${MONTHS.map(mn => {
+                    const mName = `${mn} ${currentYear}`;
+                    const rec = memberRecs.find(r => r.date === mName);
+                    const st = rec ? rec.status : null;
+                    const color = st === 'Done' ? 'var(--green)' : st === 'Pending' ? 'var(--orange)' : 'rgba(255,255,255,0.1)';
+                    const icon = st === 'Done' ? '✅' : st === 'Pending' ? '⏳' : '—';
+                    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <span style="font-size:12px; font-weight:600;">${mn}</span>
+                        <span style="font-size:11px; color:${color}; font-weight:700;">${icon} ${st || 'No Record'} ${rec ? '· ₹'+rec.amount : ''}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
 
-        // ─── MONTHS ───
-        function renderMonths() {
-            document.getElementById('monthList').innerHTML = MONTHS.map(m => {
-                const mName = `${m} ${currentYear}`;
-                const isActive = mName === selectedMonth;
-                return `<button onclick="switchMonth('${mName}')" class="month-btn ${isActive ? 'active' : ''}">${m}</button>`;
-            }).join('');
-        }
+        <button class="wa-btn" style="width:100%; justify-content:center;" onclick="window.open('${waLink}', '_blank')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Send WhatsApp Reminder
+        </button>
+    `;
+    document.getElementById('detailPanel').classList.add('open');
+    document.getElementById('detailOverlay').classList.add('show');
+}
 
-        function switchMonth(m) {
-            selectedMonth = m;
-            document.getElementById('activeMonthTitle').textContent = m;
-            loadData();
-        }
+function closeDetail() {
+    document.getElementById('detailPanel').classList.remove('open');
+    document.getElementById('detailOverlay').classList.remove('show');
+}
 
-        function changeYear(year) {
-            currentYear = year;
-            const monthName = selectedMonth.split(' ')[0];
-            switchMonth(`${monthName} ${currentYear}`);
-        }
+// ── STATS VIEW ──
+function renderStats() {
+    // Leaderboard — total paid across all time
+    const lb = MEMBERS.map(m => {
+        const total = allData.filter(r => r.name === m.name && r.status === 'Done').reduce((s, r) => s + Number(r.amount), 0);
+        const count = allData.filter(r => r.name === m.name && r.status === 'Done').length;
+        return { ...m, total, count };
+    }).sort((a, b) => b.total - a.total);
 
-        function logout() {
-            sessionStorage.removeItem('bbUser');
-            currentUser = null;
-            document.getElementById('dashboardScreen').classList.add('hidden');
-            document.getElementById('authScreen').classList.remove('hidden');
-            document.getElementById('loginForm').reset();
-            showToast('Logged out successfully');
-        }
+    const medals = ['🥇', '🥈', '🥉'];
+    document.getElementById('leaderboard').innerHTML = lb.map((m, i) => `
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div class="lb-rank" style="color:${i<3?['#fbbf24','#9ca3af','#b45309'][i]:'rgba(255,255,255,0.2)'}; width:28px;">${medals[i] || (i+1)}</div>
+            <div style="flex:1;">
+                <div style="font-weight:700; font-size:13px;">${m.name.split(' ')[0]}</div>
+                <div style="font-size:10px; color:rgba(255,255,255,0.3);">${m.count} payments</div>
+            </div>
+            <div class="logo" style="font-size:18px; color:var(--accent);">₹${m.total.toLocaleString('en-IN')}</div>
+        </div>`).join('');
 
-        // ─── AUTO-LOGIN ───
-        const saved = sessionStorage.getItem('bbUser');
-        if (saved) {
-            try {
-                currentUser = JSON.parse(saved);
-                initDashboard();
-            } catch (e) {
-                sessionStorage.removeItem('bbUser');
-            }
-        }
-    </script>
+    // Payment rate per member
+    document.getElementById('paymentRate').innerHTML = MEMBERS.map(m => {
+        const recs = allData.filter(r => r.name === m.name);
+        const paid = recs.filter(r => r.status === 'Done').length;
+        const rate = recs.length > 0 ? Math.round((paid / recs.length) * 100) : 0;
+        const color = rate >= 80 ? 'var(--green)' : rate >= 50 ? 'var(--orange)' : 'var(--red)';
+        return `<div style="margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; font-weight:600;">${m.name.split(' ')[0]}</span>
+                <span style="font-size:11px; font-weight:700; color:${color};">${rate}%</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${rate}%; background:${color};"></div></div>
+        </div>`;
+    }).join('');
+}
+
+// ── TABS ──
+function switchTab(tab) {
+    document.getElementById('ledgerView').classList.toggle('hidden', tab !== 'ledger');
+    document.getElementById('statsView').classList.toggle('hidden', tab !== 'stats');
+    document.getElementById('tabLedger').classList.toggle('active', tab === 'ledger');
+    document.getElementById('tabStats').classList.toggle('active', tab === 'stats');
+}
+
+// ── SAVE ENTRY ──
+async function saveEntry(name, id, btn) {
+    const orig = btn.textContent; btn.textContent = '...'; btn.disabled = true;
+    try {
+        const res = await fetch('/api/records', { method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ name, amount: document.getElementById(`amt-${id}`).value, status: document.getElementById(`st-${id}`).value, date: selectedMonth, mobile: currentUser.mobile, token: currentUser.token }) });
+        if (res.ok) { toast(`${name.split(' ')[0]} updated ✓`); loadData(); }
+        else { const d = await res.json(); toast(d.error || 'Save failed', 'e'); }
+    } catch { toast('Server unreachable', 'e'); }
+    finally { btn.textContent = orig; btn.disabled = false; }
+}
+
+// ── EXPENSE ──
+function openExpense() {
+    document.getElementById('expDate').value = selectedMonth;
+    document.getElementById('expenseModal').classList.add('show');
+}
+function closeExpense() { document.getElementById('expenseModal').classList.remove('show'); }
+
+async function saveExpense() {
+    const desc = document.getElementById('expDesc').value.trim();
+    const amt = document.getElementById('expAmt').value;
+    const date = document.getElementById('expDate').value.trim();
+    const cat = document.getElementById('expCat').value;
+    if (!desc || !amt || !date) return toast('Pura bharo!', 'e');
+    try {
+        const res = await fetch('/api/expenses', { method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ description: desc, amount: Number(amt), date, category: cat, mobile: currentUser.mobile, token: currentUser.token }) });
+        if (res.ok) { toast('Expense saved ✓'); closeExpense(); document.getElementById('expDesc').value = ''; document.getElementById('expAmt').value = ''; loadData(); }
+        else { const d = await res.json(); toast(d.error || 'Failed', 'e'); }
+    } catch { toast('Server unreachable', 'e'); }
+}
+
+async function deleteExpense(id) {
+    if (!confirm('Delete karna hai?')) return;
+    try {
+        const res = await fetch(`/api/expenses/${id}`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ mobile: currentUser.mobile, token: currentUser.token }) });
+        if (res.ok) { toast('Deleted'); loadData(); }
+    } catch { toast('Failed', 'e'); }
+}
+
+// ── PDF EXPORT ──
+function exportPDF() {
+    const monthRecs = MEMBERS.map(m => {
+        const rec = allData.find(r => r.name === m.name && r.date === selectedMonth);
+        return { name: m.name, status: rec?.status || 'Pending', amount: rec?.amount || 500 };
+    });
+    const total = monthRecs.filter(r => r.status === 'Done').reduce((s, r) => s + Number(r.amount), 0);
+
+    const win = window.open('', '_blank');
+    win.document.write(`<html><head><title>Bisht Bros - ${selectedMonth}</title>
+    <style>body{font-family:Arial,sans-serif;padding:40px;} h1{color:#1e3a5f;} table{width:100%;border-collapse:collapse;margin-top:20px;} th{background:#1e3a5f;color:white;padding:12px;text-align:left;} td{padding:10px;border-bottom:1px solid #eee;} .done{color:green;font-weight:bold;} .pending{color:orange;font-weight:bold;} .total{background:#f0f4f8;font-weight:bold;}</style>
+    </head><body>
+    <h1>Bisht Bros — ${selectedMonth}</h1>
+    <p>Generated: ${new Date().toLocaleString('en-IN')}</p>
+    <table><thead><tr><th>#</th><th>Name</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+    ${monthRecs.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>₹${r.amount}</td><td class="${r.status.toLowerCase()}">${r.status}</td></tr>`).join('')}
+    <tr class="total"><td colspan="2">Total Collected</td><td>₹${total.toLocaleString('en-IN')}</td><td>${monthRecs.filter(r=>r.status==='Done').length}/${MEMBERS.length} paid</td></tr>
+    </tbody></table></body></html>`);
+    win.document.close();
+    win.print();
+}
+
+// ── MONTHS ──
+function renderMonths() {
+    document.getElementById('monthList').innerHTML = MONTHS.map(m => {
+        const mn = `${m} ${currentYear}`;
+        return `<button class="month-btn ${mn === selectedMonth ? 'active' : ''}" onclick="switchMonth('${mn}')">${m}</button>`;
+    }).join('');
+}
+
+function switchMonth(m) { selectedMonth = m; document.getElementById('activeTitle').textContent = m; loadData(); }
+function changeYear(y) { currentYear = y; const mn = selectedMonth.split(' ')[0]; switchMonth(`${mn} ${currentYear}`); }
+
+function logout() {
+    try { fetch('/api/logout', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: currentUser?.token }) }); } catch {}
+    sessionStorage.removeItem('bbUser'); location.reload();
+}
+
+// ── AUTO LOGIN ──
+const saved = sessionStorage.getItem('bbUser');
+if (saved) { try { currentUser = JSON.parse(saved); initDash(); } catch { sessionStorage.removeItem('bbUser'); } }
+</script>
 </body>
 </html>
+
